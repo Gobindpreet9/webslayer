@@ -1,11 +1,9 @@
-from pydantic import BaseModel
+from langchain_core.pydantic_v1 import BaseModel, Field
 
-event_schema = {
-    "properties": {
-        "event_name": {"type": "string"},
-        "date": {"type": "date"},
-        "description": {"type": "string"},
-        "type": {"type": "string"}
-    },
-    "required": ["event_name", "date", "description"],
-}
+
+class EventSchema(BaseModel):
+    event_name: str = Field(description="Name of the event")
+    event_date: str = Field(default=None, description="Date of the event.")
+    description: str = Field(description="Description of the event")
+    event_tags: str = Field(description="Tags that can be assigned to this event. For example music, sports, festival "
+                                        "etc.")

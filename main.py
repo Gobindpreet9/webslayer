@@ -1,17 +1,21 @@
+from schema.event_schema import EventSchema
+from scraper.data_extractor import DataExtractor
 from scraper.data_fetcher import DataFetcher
-from schema.event_schema import event_schema
+from tests_folder.fake_events_data import html_content
 
 
 def main(url, tags, schema):
-    print(f"Getting data from {url}")
-
+    print(f"Getting data from {url}.")
     fetcher = DataFetcher()
     website_data = fetcher.get_data(url);
-    print(website_data)
+    print(f"Scraped data:\n{website_data}")
 
-    print("Extracting data using LLM")
+    print("Extracting data using LLM.")
+    extractor = DataExtractor(EventSchema)
+    extracted_data = extractor.extract(website_data)
+    print(f"Response:\n{extracted_data}")
 
 
 if __name__ == "__main__":
     victoria_buzz_url = "https://www.victoriabuzz.com/category/events/"
-    main(victoria_buzz_url, ["span"], event_schema)
+    main(victoria_buzz_url, ["span"], EventSchema)
