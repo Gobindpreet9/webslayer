@@ -1,11 +1,17 @@
 from bs4 import BeautifulSoup
 import chromedriver_autoinstaller
 from selenium import webdriver
+import logging
+
+logger = logging.getLogger(__name__)
 
 chromedriver_autoinstaller.install()
 
 
 class DataFetcher:
+    def __init__(self, logger):
+        self.logger = logger
+
     def get_data(self, url):
         soup = self.get_page(url)
         if soup:
@@ -21,17 +27,16 @@ class DataFetcher:
             page_source = driver.page_source
             return self.parse_html(page_source)
         except Exception as e:
-            print(f"An error occurred: {e}")
+            self.logger.error(f"An error occurred: {e}")
         finally:
             driver.quit()
 
-    @staticmethod
-    def parse_html(html_content):
+    def parse_html(self, html_content):
         try:
             soup = BeautifulSoup(html_content, 'html.parser')
             return soup
         except Exception as e:
-            print(f"Error parsing HTML: {e}")
+            self.logger.error(f"Error parsing HTML: {e}")
             return None
 
     def clean_data(self, soup):

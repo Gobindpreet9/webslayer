@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import torch
@@ -25,6 +26,7 @@ class GraphState(TypedDict):
         documents: list of documents
         are_there_hallucinations: whether there are hallucinations
         quality: quality score
+        logger: logger
     """
     schema: BaseModel
     question: str
@@ -35,12 +37,14 @@ class GraphState(TypedDict):
     documents: str
     are_there_hallucinations: bool
     quality: int
+    logger: logging.Logger
 
 
 class Scraper:
     GRADE_DOCUMENTS = "grade_documents"
 
-    def __init__(self, schema):
+    def __init__(self, schema, logger):
+        self.logger = logger
         self.state = GraphState(
             schema=schema,
             question="",
@@ -50,7 +54,8 @@ class Scraper:
             comments=[],
             documents="",
             are_there_hallucinations=False,
-            quality=0
+            quality=0,
+            logger=logger
         )
 
         # Clear GPU cache before running the model
@@ -134,14 +139,14 @@ def decide_to_generate(state: GraphState) -> str:
        Returns:
            str: Binary decision for next node to call
        """
-    print("---ASSESS GRADED DOCUMENTS---")
+    state['logger'].info("---ASSESS GRADED DOCUMENTS---")
     is_more_search_required = state["web_search"]
 
     if is_more_search_required:
-        print("---DECISION: ALL DOCUMENTS ARE NOT RELEVANT TO QUESTION, DO WEB SEARCH---")
+        state['logger'].info("---DECISION: ALL DOCUMENTS ARE NOT RELEVANT TO QUESTION, DO WEB SEARCH---")
         return "extract_data"  # TODO: return websearch
     else:
-        print("---DECISION: GENERATE---")
+        state['logger'].info("---DECISION: GENERATE---")
         return "extract_data"
 
 
@@ -155,16 +160,16 @@ def decide_to_regenerate(state) -> str:
        Returns:
            str: Binary decision for next node to call
        """
-    print("---ASSESS HALLUCINATION CHECK RESULTS---")
+    state['logger'].info("---ASSESS HALLUCINATION CHECK RESULTS---")
     are_there_hallucinations = state["are_there_hallucinations"]
 
     if are_there_hallucinations:
-        print(
+        state['logger'].info(
             "---DECISION: INCLUDES HALLUCINATIONS, RE-GENERATE WITH COMMENTS---"
         )
         return "extract_data"
     else:
-        print("---DECISION: NO HALLUCINATIONS, CHECK QUALITY---")
+        state['logger'].info("---DECISION: NO HALLUCINATIONS, CHECK QUALITY---")
         return "quality_assurance"
 
 
@@ -178,12 +183,12 @@ def grade_generation(state) -> str:
         Returns:
             str: Binary decision for next node to call.
     """
-    print("---ASSESS ANSWER QUALITY---")
+    state['logger'].info("---ASSESS ANSWER QUALITY---")
     quality = state["quality"]
 
     if quality > 7:
-        print("---DECISION: QUALITY ACCEPTED---")
+        state['logger'].info("---DECISION: QUALITY ACCEPTED---")
         return "useful"
     else:
-        print("---DECISION: ANSWER NOT UP TO PAR, RE-GENERATE WITH COMMENTS---")
+        state['logger'].info("---DECISION: ANSWER NOT UP TO PAR, RE-GENERATE WITH COMMENTS---")
         return "not useful"
