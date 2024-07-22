@@ -27,6 +27,8 @@ class GraphState(TypedDict):
         are_there_hallucinations: whether there are hallucinations
         quality: quality score
         logger: logger
+        hallucination_check_count: number of hallucination checks done
+        quality_check_count: number of quality checks done
     """
     schema: BaseModel
     question: str
@@ -38,6 +40,8 @@ class GraphState(TypedDict):
     are_there_hallucinations: bool
     quality: int
     logger: logging.Logger
+    hallucination_check_count: int
+    quality_check_count: int
 
 
 class Scraper:
@@ -55,7 +59,9 @@ class Scraper:
             documents="",
             are_there_hallucinations=False,
             quality=0,
-            logger=logger
+            logger=logger,
+            hallucination_check_count=0,
+            quality_check_count=0
         )
 
         # Clear GPU cache before running the model
@@ -160,10 +166,10 @@ def decide_to_regenerate(state) -> str:
        Returns:
            str: Binary decision for next node to call
        """
-    state['logger'].info("---ASSESS HALLUCINATION CHECK RESULTS---")
-    are_there_hallucinations = state["are_there_hallucinations"]
 
-    if are_there_hallucinations:
+    state['logger'].info(f"---ASSESS HALLUCINATION CHECK RESULTS. ATTEMPT {state['hallucination_check_count']}---")
+
+    if state["are_there_hallucinations"]:
         state['logger'].info(
             "---DECISION: INCLUDES HALLUCINATIONS, RE-GENERATE WITH COMMENTS---"
         )
@@ -183,10 +189,9 @@ def grade_generation(state) -> str:
         Returns:
             str: Binary decision for next node to call.
     """
-    state['logger'].info("---ASSESS ANSWER QUALITY---")
-    quality = state["quality"]
+    state['logger'].info(f"---ASSESS ANSWER QUALITY. ATTEMPT {state['quality_check_count']}---")
 
-    if quality > 7:
+    if state["quality"] > 7:
         state['logger'].info("---DECISION: QUALITY ACCEPTED---")
         return "useful"
     else:

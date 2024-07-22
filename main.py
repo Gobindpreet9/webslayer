@@ -5,10 +5,10 @@ import urllib.robotparser
 import logging
 
 logger = logging.getLogger(__name__)
+LOG_FILE_NAME = 'webslayer-logs.log'
 
 
 def main(url, tags, schema):
-
     validator = setup_robots_validator(url)
     if validator and not validator.can_fetch("*", url):
         logger.debug("Access denied. Please check the robots.txt file.")
@@ -47,7 +47,7 @@ def setup_logging():
     logger.setLevel(logging.DEBUG)
 
     # Create a file handler
-    file_handler = logging.FileHandler('webslayer-logs.log', encoding='utf-8')
+    file_handler = logging.FileHandler(LOG_FILE_NAME, encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)
 
     # Create a console handler
