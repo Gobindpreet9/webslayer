@@ -20,7 +20,7 @@ Agent to evaluate the response based on provided data to identify any hallucinat
 
 
 class HallucinationGraderAgent(Agent):
-    MAX_HALLUCINATION_CHECKS = 3
+    MAX_HALLUCINATION_CHECKS = 2
     PROMPT_TEMPLATE = """
        You are tasked with evaluating the provided document content to identify any hallucinations, which are instances
         of incorrect, misleading, or fabricated information. Your response should strictly adhere to the requested JSON 
@@ -50,10 +50,17 @@ class HallucinationGraderAgent(Agent):
     def act(self, state):
         if state["hallucination_check_count"] >= self.MAX_HALLUCINATION_CHECKS:
             state['logger'].info(f"---MAX HALLUCINATION CHECKS REACHED. PROCEEDING TO QUALITY CHECK.---")
-            state["are_there_hallucinations"] = False
-            return
+            return {
+                **state,
+                "are_there_hallucinations": False,
+                "hallucination_check_count": state["hallucination_check_count"] + 1
+            }
 
-        state["hallucination_check_count"] += 1
         response = self.get_chain().invoke({"data": state["documents"], "response": state["generation"]})
-        state["are_there_hallucinations"] = response["is_content_accurate"]
-        state["comments"] = state["comments"].append(response["hallucinations"])
+
+        return {
+            **state,
+            "hallucination_check_count": state["hallucination_check_count"] + 1,
+            "are_there_hallucinations": not response["is_content_accurate"],
+            "comments": state["comments"] + [response["hallucinations"]]
+        }

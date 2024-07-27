@@ -44,7 +44,13 @@ class DocumentGraderAgent(Agent):
         return DocumentGraderSchema
 
     def act(self, state):
-        response = self.get_chain().invoke({"document_content": state["documents"],
-                                            "target_schema": state["schema"]})
-        state["web_search"] = response["is_more_search_required"]
-        state["urlsToSearch"] = response["urls"]
+        response = self.get_chain().invoke({
+            "document_content": state["documents"],
+            "target_schema": state["schema"]
+        })
+
+        return {
+            **state,
+            "web_search": response["is_more_search_required"],
+            "urls_to_search": response["urls"]
+        }

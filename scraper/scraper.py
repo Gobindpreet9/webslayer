@@ -173,7 +173,7 @@ def decide_to_regenerate(state) -> str:
         state['logger'].info(
             "---DECISION: INCLUDES HALLUCINATIONS, RE-GENERATE WITH COMMENTS---"
         )
-        return "extract_data"
+        return "regenerate"
     else:
         state['logger'].info("---DECISION: NO HALLUCINATIONS, CHECK QUALITY---")
         return "quality_assurance"
@@ -191,7 +191,7 @@ def grade_generation(state) -> str:
     """
     state['logger'].info(f"---ASSESS ANSWER QUALITY. ATTEMPT {state['quality_check_count']}---")
 
-    if state["quality"] > 7:
+    if state["quality"] >= 6:
         state['logger'].info("---DECISION: QUALITY ACCEPTED---")
         return "useful"
     else:

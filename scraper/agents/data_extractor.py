@@ -35,5 +35,8 @@ class DataExtractorAgent(Agent):
         return self._schema
 
     def act(self, state):
-        response = self.get_chain().invoke({"data": state["documents"], "comments": state["comments"] or ""})
-        state["generation"] = response
+        response = self.get_chain().invoke({
+            "data": state["documents"],
+            "comments": state["comments"] or ""
+        })
+        return {**state, "generation": response}

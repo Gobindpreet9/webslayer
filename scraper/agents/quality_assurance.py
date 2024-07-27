@@ -21,7 +21,7 @@ Agent to evaluate the quality of the generated content based on provided documen
 
 
 class QualityAssuranceAgent(Agent):
-    MAX_QUALITY_CHECKS = 3
+    MAX_QUALITY_CHECKS = 2
     PROMPT_TEMPLATE = """
         You are tasked with evaluating the provided document content based on overall quality and providing specific 
         comments or feedback. Your response should strictly adhere to the requested JSON output format and should not 
@@ -49,8 +49,13 @@ class QualityAssuranceAgent(Agent):
         if state["quality_check_count"] >= self.MAX_QUALITY_CHECKS:
             state['logger'].info(f"---MAX QUALITY CHECKS REACHED. FINISHING.---")
             state["quality"] = MAX_QUALITY
+            return {**state, "quality": MAX_QUALITY}
 
-        state["quality_check_count"] = state["quality_check_count"] + 1
         response = self.get_chain().invoke({"document_content": state["documents"], "response": state["generation"]})
-        state["quality"] = response["quality"]
-        state["comments"] = state["comments"].append(response["comments"])
+
+        return {
+            **state,
+            "quality_check_count": state["quality_check_count"] + 1,
+            "quality": response["quality"],
+            "comments": state["comments"] + response["comments"]
+        }

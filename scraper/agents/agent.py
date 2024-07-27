@@ -88,5 +88,5 @@ class Agent(ABC):
                 state (GraphState): The current graph state.
 
             Returns:
-                Any: The agent's response."""
+                Any (GraphState): The updated graph state."""
         pass
