@@ -24,7 +24,7 @@ def main(url, tags, schema):
     extractor = Scraper(schema, logger)
     extracted_data = extractor.extract(website_data)
 
-    logger.info(f"Response:\n{extracted_data}")
+    logger.info(f"Response:\n{extracted_data['generation']}")
 
 
 def setup_robots_validator(url):
