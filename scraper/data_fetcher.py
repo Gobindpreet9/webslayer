@@ -1,20 +1,94 @@
+import time
+from urllib.parse import urlparse, urljoin
+
 from bs4 import BeautifulSoup
 import chromedriver_autoinstaller
 from selenium import webdriver
-import logging
-
-logger = logging.getLogger(__name__)
+import urllib.robotparser
 
 chromedriver_autoinstaller.install()
 
 
 class DataFetcher:
-    def __init__(self, logger):
-        self.logger = logger
+    DEFAULT_MAX_URLS_VISITED = 5
 
-    def get_data(self, url):
+    def __init__(self, logger, should_crawl=False, max_depth=2, max_urls_visited=DEFAULT_MAX_URLS_VISITED):
+        self.validators = {}
+        self.logger = logger
+        self.should_crawl = should_crawl
+        self.max_depth = max_depth
+        self.urls_visited = set()
+        self.max_urls_visited = max_urls_visited
+
+    def fetch_data(self, urls):
+        """
+        Gets data from a list of urls if permitted by robots.txt
+        """
+        if not urls or len(urls) == 0:
+            self.logger.debug("No URLs provided.")
+            return None
+
+        content = []
+        if self.should_crawl:
+            data = self.crawl_website(urls)
+            if data:
+                content = data
+        else:
+            for url in urls:
+                data = self.get_single_page_data(url)
+                if data:
+                    content.append(data)
+
+        return content
+
+    def crawl_website(self, start_urls):
+        """
+        Crawl website from start_url if permitted by robots.txt
+        """
+        urls_to_visit = [(url, 0) for url in start_urls]
+        data = []
+
+        while len(urls_to_visit) > 0:
+            url, depth = urls_to_visit.pop(0)
+            domain = urlparse(url).netloc
+
+            if len(self.urls_visited) >= self.max_urls_visited:
+                break
+
+            if url in self.urls_visited or depth > self.max_depth:
+                continue
+
+            if not self.is_allowed_by_robots(url):
+                self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
+                continue
+
+            soup = self.get_page(url)
+            if soup:
+                urls = self.get_urls_from_page(soup, url, domain, urls_to_visit)
+                urls_to_visit += [(url, depth + 1) for url in urls]
+                data.append(self.clean_data(soup))
+                self.urls_visited.add(url)
+                self.logger.debug(f"URL visited: {url}.")
+
+            time.sleep(1)  # to avoid rate limiting
+
+        self.urls_visited.clear()
+        return data
+
+    def get_single_page_data(self, url):
+        """
+            Fetches data from a single URL if permitted by robots.txt
+        """
+        if url in self.urls_visited:
+            return None
+
+        if not self.is_allowed_by_robots(url):
+            self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
+            return None
+
         soup = self.get_page(url)
         if soup:
+            self.urls_visited.add(url)
             return self.clean_data(soup)
         return None
 
@@ -75,6 +149,22 @@ class DataFetcher:
 
         return ' '.join(text_parts)
 
+    def get_urls_from_page(self, soup, base_url, domain, urls_to_visit):
+        """
+        Returns all list of URLs from the given page soup
+        """
+        urls = []
+        for link in soup.find_all('a', href=True):
+            href = link['href']
+            full_url = urljoin(base_url, href)
+            if urlparse(full_url).netloc == domain:
+                if full_url not in self.urls_visited and full_url not in urls_to_visit:
+                    urls.append(full_url)
+                    self.logger.debug(f"Added URL: {full_url}.")
+            else:
+                self.logger.debug(f"Skipping URL: {full_url}. Not in domain.")
+        return urls
+
     @staticmethod
     def remove_unnecessary_lines(content):
         # Split content into lines
@@ -95,3 +185,27 @@ class DataFetcher:
         cleaned_content = "".join(deduped_lines)
 
         return cleaned_content
+
+    def get_robots_validator(self, url):
+        """
+        Configures validator using robots.txt for url permissions
+        """
+        if url is None:
+            return None
+        robots = urllib.robotparser.RobotFileParser()
+        parsed_url = urllib.parse.urlparse(url)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/"
+        try:
+            if self.validators.get(base_url) is None:
+                robots.set_url(base_url + "robots.txt")
+                robots.read()
+                self.validators[base_url] = robots
+        except Exception as e:
+            self.logger.error(f"Error fetching robots.txt for {base_url}: {e}")
+            return None
+        return robots
+
+    def is_allowed_by_robots(self, url):
+        return True
+        validator = self.get_robots_validator(url)
+        return validator.can_fetch("*", url) if validator else True

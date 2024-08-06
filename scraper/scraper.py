@@ -7,9 +7,9 @@ from langgraph.graph import StateGraph, END
 from typing_extensions import TypedDict
 
 from scraper.agents.data_extractor import DataExtractorAgent
-from scraper.agents.document_grader import DocumentGraderAgent
 from scraper.agents.hallucination_grader import HallucinationGraderAgent
 from scraper.agents.quality_assurance import QualityAssuranceAgent
+from scraper.data_fetcher import DataFetcher
 
 
 class GraphState(TypedDict):
@@ -36,7 +36,7 @@ class GraphState(TypedDict):
     web_search: bool
     urls_to_search: List[str]
     comments: List[str]
-    documents: str
+    documents: List[str]
     are_there_hallucinations: bool
     quality: int
     logger: logging.Logger
@@ -45,42 +45,46 @@ class GraphState(TypedDict):
 
 
 class Scraper:
-    GRADE_DOCUMENTS = "grade_documents"
-
-    def __init__(self, schema, logger):
+    def __init__(self, schema, urls_to_search, logger, crawl_website=False, crawl_max_depth=3):
         self.logger = logger
+        self.crawl_website = crawl_website
+        self.crawl_max_depth = crawl_max_depth
         self.state = GraphState(
             schema=schema,
             question="",
             generation="",
-            web_search=False,
-            urls_to_search=[],
+            crawl_website=crawl_website,
+            urls_to_search=urls_to_search,
             comments=[],
-            documents="",
+            documents=[],
             are_there_hallucinations=False,
             quality=0,
             logger=logger,
             hallucination_check_count=0,
             quality_check_count=0
         )
-
         # Clear GPU cache before running the model
         torch.cuda.empty_cache()
+        self.state["documents"] = self.fetch_data()
 
     def set_schema(self, schema):
         self.state.schema = schema
 
-    def extract(self, document: str):
+    def fetch_data(self):
+        self.logger.info(f"Getting data from {self.state['urls_to_search']}.")
+        fetcher = DataFetcher(self.logger, self.crawl_website, self.crawl_max_depth)
+        docs = fetcher.fetch_data(self.state['urls_to_search'])
+        self.logger.info(f"Scraped data:\n{docs}")
+        return docs
+
+    def extract(self):
         """
             Extracts data from a document using an extraction team.
-
-            Args:
-                document (str): The document to extract data from.
 
             Returns:
                 dict: The extracted data.
             """
-        self.state["documents"] = document
+        self.logger.info("Extracting data using LLM.")
         extraction_team = self.init_extraction_team()
         graph = extraction_team.compile()
         extracted_data = graph.invoke(self.state)
@@ -92,7 +96,6 @@ class Scraper:
         :return: The initialized extraction team.
         """
         # Initialize agents
-        document_grader_agent = DocumentGraderAgent()
         data_extractor_agent = DataExtractorAgent(schema=self.state["schema"])
         hallucination_grader_agent = HallucinationGraderAgent()
         quality_assurance_agent = QualityAssuranceAgent()
@@ -100,21 +103,13 @@ class Scraper:
         workflow = StateGraph(GraphState)
 
         # Add nodes for each agent
-        workflow.add_node(self.GRADE_DOCUMENTS, document_grader_agent.act)
         workflow.add_node("extract_data", data_extractor_agent.act)
         workflow.add_node("grade_hallucinations", hallucination_grader_agent.act)
         workflow.add_node("quality_assurance", quality_assurance_agent.act)
         # TODO: Add node for more web search
 
         # Add edges
-        workflow.set_entry_point(self.GRADE_DOCUMENTS)
-        workflow.add_conditional_edges(
-            self.GRADE_DOCUMENTS,
-            decide_to_generate,
-            {
-                "extract_data": "extract_data"
-                # TODO: "web_search": "web_search"
-            })
+        workflow.set_entry_point("extract_data")
         workflow.add_edge("extract_data", "grade_hallucinations")
         workflow.add_conditional_edges(
             "grade_hallucinations",
