@@ -61,5 +61,5 @@ class HallucinationGraderAgent(Agent):
             "hallucination_check_count": state["hallucination_check_count"] + 1,
             "are_there_hallucinations": not Utils.get_value_or_default(response, "is_content_accurate",
                                                                        True, state["logger"]),
-            "comments": state["comments"] + Utils.get_value_or_default(response, "comments", [], state["logger"])
+            "comments": state["comments"] + Utils.get_value_or_default(response, "hallucinations", [], state["logger"])
         }

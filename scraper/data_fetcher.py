@@ -10,7 +10,7 @@ chromedriver_autoinstaller.install()
 
 
 class DataFetcher:
-    DEFAULT_MAX_URLS_VISITED = 5
+    DEFAULT_MAX_URLS_VISITED = 1
 
     def __init__(self, logger, should_crawl=False, max_depth=2, max_urls_visited=DEFAULT_MAX_URLS_VISITED):
         self.validators = {}
@@ -206,6 +206,5 @@ class DataFetcher:
         return robots
 
     def is_allowed_by_robots(self, url):
-        return True
         validator = self.get_robots_validator(url)
         return validator.can_fetch("*", url) if validator else True
