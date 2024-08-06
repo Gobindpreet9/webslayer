@@ -1,25 +1,23 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List
 from scraper.agents.agent import Agent
-
-"""
-Schema for the HallucinationGraderAgent 
-"""
+from utils.utils import Utils
 
 
 class HallucinationGraderSchema(BaseModel):
+    """
+    Schema for the HallucinationGraderAgent
+    """
     is_content_accurate: bool = Field(default=False,
                                       description="True if no hallucinations are found, false otherwise.")
     hallucinations: List[str] = Field(default=[], description="A list providing details about existing hallucinations, "
                                                               "if any.")
 
 
-"""
-Agent to evaluate the response based on provided data to identify any hallucinations.
-"""
-
-
 class HallucinationGraderAgent(Agent):
+    """
+    Agent to evaluate the response based on provided data to identify any hallucinations.
+    """
     MAX_HALLUCINATION_CHECKS = 2
     PROMPT_TEMPLATE = """
        You are tasked with evaluating the provided document content to identify any hallucinations, which are instances
@@ -61,6 +59,7 @@ class HallucinationGraderAgent(Agent):
         return {
             **state,
             "hallucination_check_count": state["hallucination_check_count"] + 1,
-            "are_there_hallucinations": not response["is_content_accurate"],
-            "comments": state["comments"] + [response["hallucinations"]]
+            "are_there_hallucinations": not Utils.get_value_or_default(response, "is_content_accurate",
+                                                                       True, state["logger"]),
+            "comments": state["comments"] + Utils.get_value_or_default(response, "comments", [], state["logger"])
         }

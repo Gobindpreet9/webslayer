@@ -1,11 +1,10 @@
 from scraper.agents.agent import Agent
 
-"""
-Agent class for extracting data from web data.
-"""
-
 
 class DataExtractorAgent(Agent):
+    """
+    Agent class for extracting data from web data.
+    """
     PROMPT_TEMPLATE = """
         You are tasked with extracting valuable information related to various events from the provided web data. 
         Your response should strictly adhere to the requested format and should not include any extraneous information. 

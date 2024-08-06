@@ -1,26 +1,24 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List
 from scraper.agents.agent import Agent
-
-"""
-Schema for the quality assessment.
-"""
+from utils.utils import Utils
 
 MAX_QUALITY = 10
 
 
 class QualityAssuranceSchema(BaseModel):
+    """
+    Schema for the quality assessment.
+    """
     quality: int = Field(default=0,
                          description=f"Overall quality score of the document content on a scale from 1 to {MAX_QUALITY}.")
     comments: List[str] = Field(default=[], description="Specific comments or feedback regarding the document content.")
 
 
-"""
-Agent to evaluate the quality of the generated content based on provided document and schema.
-"""
-
-
 class QualityAssuranceAgent(Agent):
+    """
+    Agent to evaluate the quality of the generated content based on provided document and schema.
+    """
     MAX_QUALITY_CHECKS = 2
     PROMPT_TEMPLATE = """
         You are tasked with evaluating the provided document content based on overall quality and providing specific 
@@ -56,6 +54,6 @@ class QualityAssuranceAgent(Agent):
         return {
             **state,
             "quality_check_count": state["quality_check_count"] + 1,
-            "quality": response["quality"],
-            "comments": state["comments"] + response["comments"]
+            "quality": Utils.get_value_or_default(response, "quality", 10, state["logger"]),
+            "comments": state["comments"] + Utils.get_value_or_default(response, "comments", [], state["logger"])
         }
