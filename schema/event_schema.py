@@ -1,4 +1,5 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
+from typing import List
 
 
 class EventSchema(BaseModel):
@@ -7,3 +8,7 @@ class EventSchema(BaseModel):
     description: str = Field(description="Description of the event")
     event_tags: str = Field(description="Tags that can be assigned to this event. For example music, sports, festival "
                                         "etc.")
+
+
+class EventsSchema(BaseModel):
+    events: List[EventSchema]

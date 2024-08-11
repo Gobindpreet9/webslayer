@@ -54,7 +54,7 @@ class Agent(ABC):
             Method configures the LLM instance. The default LLM is llama3.
         """
         self.llm = Ollama(
-            model=Config.MODEL_ID_LLAMA,
+            model=Config.MODEL_TO_USE,
             num_ctx=8000,
             temperature=0.4,
             format='json'

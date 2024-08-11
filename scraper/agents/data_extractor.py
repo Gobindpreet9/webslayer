@@ -33,9 +33,24 @@ class DataExtractorAgent(Agent):
     def schema(self):
         return self._schema
 
+    @staticmethod
+    def combine_results(results):
+        combined_result = []
+        # todo: should combine keys
+        for result in results:
+            combined_result.append(result)
+
+        return combined_result
+
     def act(self, state):
-        response = self.get_chain().invoke({
-            "data": state["documents"],
-            "comments": state["comments"] or ""
-        })
-        return {**state, "generation": response}
+        results = []
+
+        # todo: use RecursiveCharacterTextSplitter or similar if documents are too large
+        for document in state["documents"]:
+            response = self.get_chain().invoke({
+                "data": document,
+                "comments": state["comments"] or ""
+            })
+            results.append(response)
+
+        return {**state, "generation": self.combine_results(results)}

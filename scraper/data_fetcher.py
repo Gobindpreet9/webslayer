@@ -160,7 +160,7 @@ class DataFetcher:
             if urlparse(full_url).netloc == domain:
                 if full_url not in self.urls_visited and full_url not in urls_to_visit:
                     urls.append(full_url)
-                    self.logger.debug(f"Added URL: {full_url}.")
+                    self.logger.debug(f"Added URL: {full_url}.")  # Add tests and make sure not adding duplicates
             else:
                 self.logger.debug(f"Skipping URL: {full_url}. Not in domain.")
         return urls

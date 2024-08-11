@@ -5,6 +5,9 @@ class Config:
     # ollama pull MODEL_ID before use
     MODEL_ID_PHI = "phi3:instruct"
     MODEL_ID_LLAMA = "llama3.1:8b-instruct-q8_0"
+
+    MODEL_TO_USE = MODEL_ID_LLAMA
+
     LOG_FILE_NAME = 'webslayer-logs.log'
 
     @staticmethod
