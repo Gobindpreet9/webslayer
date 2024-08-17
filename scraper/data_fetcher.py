@@ -6,19 +6,20 @@ import chromedriver_autoinstaller
 from selenium import webdriver
 import urllib.robotparser
 
+from utils.config import Config
+
 chromedriver_autoinstaller.install()
 
 
 class DataFetcher:
-    DEFAULT_MAX_URLS_VISITED = 1
-
-    def __init__(self, logger, should_crawl=False, max_depth=2, max_urls_visited=DEFAULT_MAX_URLS_VISITED):
+    def __init__(self, logger, should_crawl=Config.CRAWL_WEBSITE, max_depth=Config.CRAWL_MAX_DEPTH,
+                 max_urls_to_search=Config.MAX_URLS_TO_SEARCH):
         self.validators = {}
         self.logger = logger
         self.should_crawl = should_crawl
         self.max_depth = max_depth
         self.urls_visited = set()
-        self.max_urls_visited = max_urls_visited
+        self.max_urls_to_search = max_urls_to_search
 
     def fetch_data(self, urls):
         """
@@ -52,7 +53,7 @@ class DataFetcher:
             url, depth = urls_to_visit.pop(0)
             domain = urlparse(url).netloc
 
-            if len(self.urls_visited) >= self.max_urls_visited:
+            if len(self.urls_visited) >= self.max_urls_to_search:
                 break
 
             if url in self.urls_visited or depth > self.max_depth:

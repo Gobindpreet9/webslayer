@@ -1,37 +1,26 @@
 import logging
 
+from schema.event_schema import EventsSchema
+
 
 class Config:
-    # Model configuration
     # ollama pull MODEL_ID before use
     MODEL_ID_PHI = "phi3:instruct"
     MODEL_ID_LLAMA = "llama3.1:8b-instruct-q4_0"
+
+    FORBIDDEN_EVENTS_URL = "https://www.victoriabuzz.com/category/events/"
+    EVENTS_URL = "https://events.downtownvictoria.ca/events/"
+
+    # Model configuration
     MODEL_TO_USE = MODEL_ID_LLAMA
 
     # Logger configuration
     LOG_FILE_NAME = 'webslayer-logs.log'
     LOGGING_LEVEL = logging.INFO
 
-    @staticmethod
-    def setup_logging(logger):
-        """
-        Configures logging for application
-        """
-        logger.setLevel(Config.LOGGING_LEVEL)
-
-        # Create a file handler
-        file_handler = logging.FileHandler(Config.LOG_FILE_NAME, encoding='utf-8')
-        file_handler.setLevel(logging.DEBUG)
-
-        # Create a console handler
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
-
-        # Create a formatter and set it for both handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
-
-        # Add the handlers to the logger
-        logging.getLogger().handlers[0].setFormatter(formatter)  # root logger
-        logger.addHandler(file_handler)
+    # Scraper configuration
+    CRAWL_WEBSITE = True
+    CRAWL_MAX_DEPTH = 2
+    MAX_URLS_TO_SEARCH = 3
+    URLS = [EVENTS_URL]
+    SCHEMA = EventsSchema

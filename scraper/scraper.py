@@ -46,6 +46,16 @@ class GraphState(TypedDict):
 
 
 class Scraper:
+    """
+    The scraper class.
+
+    Args:
+        schema: schema model of the response
+        urls_to_search: list of URLs to search
+        logger: logger
+        crawl_website: whether to crawl the urls
+        crawl_max_depth: maximum depth to crawl
+    """
     def __init__(self, schema, urls_to_search, logger, crawl_website=False, crawl_max_depth=3):
         self.logger = logger
         self.crawl_website = crawl_website
@@ -88,7 +98,7 @@ class Scraper:
         extraction_team = self.init_extraction_team()
         graph = extraction_team.compile()
         extracted_data = graph.invoke(self.state)
-        return extracted_data
+        return extracted_data['generation']
 
     def init_extraction_team(self) -> StateGraph:
         """
