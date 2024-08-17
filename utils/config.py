@@ -2,20 +2,22 @@ import logging
 
 
 class Config:
+    # Model configuration
     # ollama pull MODEL_ID before use
     MODEL_ID_PHI = "phi3:instruct"
-    MODEL_ID_LLAMA = "llama3.1:8b-instruct-q8_0"
-
+    MODEL_ID_LLAMA = "llama3.1:8b-instruct-q4_0"
     MODEL_TO_USE = MODEL_ID_LLAMA
 
+    # Logger configuration
     LOG_FILE_NAME = 'webslayer-logs.log'
+    LOGGING_LEVEL = logging.INFO
 
     @staticmethod
     def setup_logging(logger):
         """
         Configures logging for application
         """
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(Config.LOGGING_LEVEL)
 
         # Create a file handler
         file_handler = logging.FileHandler(Config.LOG_FILE_NAME, encoding='utf-8')

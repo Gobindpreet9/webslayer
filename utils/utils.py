@@ -4,5 +4,5 @@ class Utils:
         if key in response:
             return response[key]
         else:
-            logger.error(f"Key {key} not found in {response}. Using default value.")
+            logger.debug(f"Key {key} not found in {response}. Using default value.")
             return default

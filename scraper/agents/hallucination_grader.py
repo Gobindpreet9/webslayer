@@ -46,8 +46,9 @@ class HallucinationGraderAgent(Agent):
         return HallucinationGraderSchema
 
     def act(self, state):
+        state['logger'].info("Checking for hallucinations.")
         if state["hallucination_check_count"] >= self.MAX_HALLUCINATION_CHECKS:
-            state['logger'].info(f"---MAX HALLUCINATION CHECKS REACHED. PROCEEDING TO QUALITY CHECK.---")
+            state['logger'].debug(f"---MAX HALLUCINATION CHECKS REACHED. PROCEEDING TO QUALITY CHECK.---")
             return {
                 **state,
                 "are_there_hallucinations": False,
@@ -56,10 +57,12 @@ class HallucinationGraderAgent(Agent):
 
         response = self.get_chain().invoke({"data": state["documents"], "response": state["generation"]})
 
+        is_content_accurate = Utils.get_value_or_default(response, "is_content_accurate", False, state["logger"])
+        hallucinations = Utils.get_value_or_default(response, "hallucinations", [], state["logger"])
+        state['logger'].debug(f"Hallucinations checked. Found: {not is_content_accurate}. Details: {hallucinations}")
         return {
             **state,
             "hallucination_check_count": state["hallucination_check_count"] + 1,
-            "are_there_hallucinations": not Utils.get_value_or_default(response, "is_content_accurate",
-                                                                       True, state["logger"]),
-            "comments": state["comments"] + Utils.get_value_or_default(response, "hallucinations", [], state["logger"])
+            "are_there_hallucinations": not is_content_accurate,
+            "comments": state["comments"] + hallucinations
         }

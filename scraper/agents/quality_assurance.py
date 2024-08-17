@@ -44,16 +44,19 @@ class QualityAssuranceAgent(Agent):
         return QualityAssuranceSchema
 
     def act(self, state):
+        state['logger'].info("Checking response quality.")
         if state["quality_check_count"] >= self.MAX_QUALITY_CHECKS:
             state['logger'].info(f"---MAX QUALITY CHECKS REACHED. FINISHING.---")
             state["quality"] = MAX_QUALITY
             return {**state, "quality": MAX_QUALITY}
 
         response = self.get_chain().invoke({"document_content": state["documents"], "response": state["generation"]})
-
+        quality = Utils.get_value_or_default(response, "quality", 10, state["logger"])
+        comments = Utils.get_value_or_default(response, "comments", [], state["logger"])
+        state['logger'].debug(f"Quality checked. Found: {quality}. Details: {comments}")
         return {
             **state,
             "quality_check_count": state["quality_check_count"] + 1,
-            "quality": Utils.get_value_or_default(response, "quality", 10, state["logger"]),
-            "comments": state["comments"] + Utils.get_value_or_default(response, "comments", [], state["logger"])
+            "quality": quality,
+            "comments": state["comments"] + comments
         }

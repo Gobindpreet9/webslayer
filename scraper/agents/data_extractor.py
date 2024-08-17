@@ -1,3 +1,5 @@
+import json
+
 from scraper.agents.agent import Agent
 
 
@@ -63,6 +65,7 @@ class DataExtractorAgent(Agent):
         return combined_result
 
     def act(self, state):
+        state['logger'].info("Extracting data using LLM.")
         results = []
 
         # todo: use RecursiveCharacterTextSplitter or similar if documents are too large
@@ -73,5 +76,6 @@ class DataExtractorAgent(Agent):
                 "comments": state["comments"] or ""
             })
             results.append(response)
-
-        return {**state, "generation": self.combine_results(results)}
+        combined_result = self.combine_results(results)
+        state['logger'].debug("Data Extracted: " + json.dumps(combined_result))
+        return {**state, "generation": combined_result}
