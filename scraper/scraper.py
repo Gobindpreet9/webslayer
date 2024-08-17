@@ -9,6 +9,7 @@ from typing_extensions import TypedDict
 from scraper.agents.data_extractor import DataExtractorAgent
 from scraper.agents.hallucination_grader import HallucinationGraderAgent
 from scraper.agents.quality_assurance import QualityAssuranceAgent
+from scraper.agents.response_cleaner import ResponseCleanerAgent
 from scraper.data_fetcher import DataFetcher
 
 
@@ -74,7 +75,7 @@ class Scraper:
         self.logger.info(f"Getting data from {self.state['urls_to_search']}.")
         fetcher = DataFetcher(self.logger, self.crawl_website, self.crawl_max_depth)
         docs = fetcher.fetch_data(self.state['urls_to_search'])
-        self.logger.info(f"Scraped data:\n{docs}")
+        self.logger.debug(f"Scraped data:\n{docs}")
         return docs
 
     def extract(self):
@@ -84,7 +85,6 @@ class Scraper:
             Returns:
                 dict: The extracted data.
             """
-        self.logger.info("Extracting data using LLM.")
         extraction_team = self.init_extraction_team()
         graph = extraction_team.compile()
         extracted_data = graph.invoke(self.state)
@@ -97,6 +97,7 @@ class Scraper:
         """
         # Initialize agents
         data_extractor_agent = DataExtractorAgent(schema=self.state["schema"])
+        response_cleaner_agent = ResponseCleanerAgent(schema=self.state["schema"])
         hallucination_grader_agent = HallucinationGraderAgent()
         quality_assurance_agent = QualityAssuranceAgent()
 
@@ -104,12 +105,14 @@ class Scraper:
 
         # Add nodes for each agent
         workflow.add_node("extract_data", data_extractor_agent.act)
+        workflow.add_node("clean_response", response_cleaner_agent.act)
         workflow.add_node("grade_hallucinations", hallucination_grader_agent.act)
         workflow.add_node("quality_assurance", quality_assurance_agent.act)
 
         # Add edges
         workflow.set_entry_point("extract_data")
-        workflow.add_edge("extract_data", "grade_hallucinations")
+        workflow.add_edge("extract_data", "clean_response")
+        workflow.add_edge("clean_response", "grade_hallucinations")
         workflow.add_conditional_edges(
             "grade_hallucinations",
             decide_to_regenerate,
