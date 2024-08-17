@@ -106,7 +106,6 @@ class Scraper:
         workflow.add_node("extract_data", data_extractor_agent.act)
         workflow.add_node("grade_hallucinations", hallucination_grader_agent.act)
         workflow.add_node("quality_assurance", quality_assurance_agent.act)
-        # TODO: Add node for more web search
 
         # Add edges
         workflow.set_entry_point("extract_data")
@@ -129,28 +128,6 @@ class Scraper:
 
 
 # Conditional edges
-
-def decide_to_generate(state: GraphState) -> str:
-    """
-       Determines whether to generate an answer, or add web search
-
-       Args:
-           state (dict): The current graph state
-
-       Returns:
-           str: Binary decision for next node to call
-       """
-    state['logger'].info("---ASSESS GRADED DOCUMENTS---")
-    is_more_search_required = state["web_search"]
-
-    if is_more_search_required:
-        state['logger'].info("---DECISION: ALL DOCUMENTS ARE NOT RELEVANT TO QUESTION, DO WEB SEARCH---")
-        return "extract_data"  # TODO: return websearch
-    else:
-        state['logger'].info("---DECISION: GENERATE---")
-        return "extract_data"
-
-
 def decide_to_regenerate(state) -> str:
     """
        Determines whether to generate an answer, or add web search

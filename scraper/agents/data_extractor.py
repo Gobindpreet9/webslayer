@@ -35,10 +35,30 @@ class DataExtractorAgent(Agent):
 
     @staticmethod
     def combine_results(results):
-        combined_result = []
-        # todo: should combine keys
+        def merge_values(v1, v2):
+            if isinstance(v1, list) and isinstance(v2, list):
+                return v1 + v2
+            elif isinstance(v1, dict) and isinstance(v2, dict):
+                return merge_dicts(v1, v2)
+            elif isinstance(v1, list):
+                return v1 + [v2]
+            elif isinstance(v2, list):
+                return [v1] + v2
+            else:
+                return [v1, v2]
+
+        def merge_dicts(d1, d2):
+            result = d1.copy()
+            for key, value in d2.items():
+                if key in result:
+                    result[key] = merge_values(result[key], value)
+                else:
+                    result[key] = value
+            return result
+
+        combined_result = {}
         for result in results:
-            combined_result.append(result)
+            combined_result = merge_dicts(combined_result, result)
 
         return combined_result
 
@@ -46,6 +66,7 @@ class DataExtractorAgent(Agent):
         results = []
 
         # todo: use RecursiveCharacterTextSplitter or similar if documents are too large
+        # loop over documents since models perform better with smaller documents
         for document in state["documents"]:
             response = self.get_chain().invoke({
                 "data": document,
