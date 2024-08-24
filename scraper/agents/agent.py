@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+
+from langchain_anthropic import ChatAnthropic
 from langchain_community.llms.ollama import Ollama
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
-from utils.config import Config
+from utils.config import Config, Model
 
 
 class Agent(ABC):
@@ -53,12 +55,21 @@ class Agent(ABC):
         """
             Method configures the LLM instance. The default LLM is llama3.
         """
-        self.llm = Ollama(
-            model=Config.MODEL_TO_USE,
-            num_ctx=8000,
-            temperature=0.4,
-            format='json'
-        )
+        if Config.MODEL_TO_USE == Model.Anthropic:
+            self.llm = ChatAnthropic(
+                    model="claude-3-5-sonnet-20240620",
+                    temperature=0,
+                    max_tokens=1024,
+                    timeout=None,
+                    max_retries=2
+                )
+        else:
+            self.llm = Ollama(
+                model=Config.LOCAL_MODEL,
+                num_ctx=8000,
+                temperature=0.4,
+                format='json'
+            )
 
     def configure_default_json_parser(self, schema=None):
         """
