@@ -1,6 +1,9 @@
 import json
 
 from scraper.agents.agent import Agent
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from utils.config import Config
 
 
 class DataExtractorAgent(Agent):
@@ -66,16 +69,24 @@ class DataExtractorAgent(Agent):
 
     def act(self, state):
         state['logger'].info("Extracting data using LLM.")
-        results = []
 
-        # todo: use RecursiveCharacterTextSplitter or similar if documents are too large
-        # loop over documents since models perform better with smaller documents
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=Config.CHUNK_SIZE,
+            chunk_overlap=Config.CHUNK_OVERLAP_SIZE,
+            length_function=len,
+        )
+        texts = []
         for document in state["documents"]:
-            response = self.get_chain().invoke({
-                "data": document,
-                "comments": state["comments"] or ""
-            })
-            results.append(response)
+            if Config.ENABLE_CHUNKING and len(document) > Config.CHUNKING_THRESHOLD:
+                texts.extend(text_splitter.create_documents([document]))
+            else:
+                texts.extend(document)
+
+        results = self.get_chain().batch(
+            [{"data": document, "comments": state["comments"] or ""} for document in texts],
+            {"max_concurrency": 1},
+        )
         combined_result = self.combine_results(results)
+
         state['logger'].debug("Data Extracted: " + json.dumps(combined_result))
         return {**state, "generation": combined_result}
