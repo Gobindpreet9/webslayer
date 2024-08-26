@@ -116,8 +116,8 @@ class DataFetcher:
 
     def clean_data(self, soup):
         cleaned_tags = self.remove_unwanted_tags(soup)
-        extracted_content = self.extract_tags(cleaned_tags, ["h1", "h2", "h3", "span", "a", "href"])  # Example tag list
-        return self.remove_unnecessary_lines(extracted_content)
+        extracted_content = self.extract_tags(cleaned_tags, ["h1", "h2", "h3", "span", "a", "href", "p"])  # Example tag list
+        return self.remove_unnecessary_lines(str(extracted_content))
 
     @staticmethod
     def remove_unwanted_tags(soup, unwanted_tags=["script", "style"]):
@@ -134,15 +134,12 @@ class DataFetcher:
            tag is an "a" tag.
            """
         text_parts = []
-
-        for tag in tags:
-            elements = soup.find_all(tag)
-            for element in elements:
-                # If the tag is a link (a tag), append its href as well
-                if tag == "a":
+        for element in soup.descendants:
+            if element.name in tags:
+                if element.name == "a":
                     href = element.get('href')
                     if href:
-                        text_parts.append(f"{element.get_text()} ({href})")
+                        text_parts.append(f"**{element.get_text()}** ({href})")
                     else:
                         text_parts.append(element.get_text())
                 else:
