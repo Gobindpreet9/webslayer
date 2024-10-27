@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  webslayer:
+    build: .
+    volumes:
+      - webslayer_data:/webslayer
+    networks:
+      - app-network
+    depends_on:
+      ollama:
+        condition: service_started
+      ollama-init:
+        condition: service_completed_successfully
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - app-network
+    command: serve
+
+  ollama-init:
+    image: curlimages/curl:latest
+    depends_on:
+      ollama:
+        condition: service_started
+    networks:
+      - app-network
+    volumes:
+      - ./ollama-init.sh:/ollama-init.sh
+    command: sh /ollama-init.sh
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+  webslayer_data:
