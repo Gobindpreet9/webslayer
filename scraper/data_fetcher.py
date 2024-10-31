@@ -1,14 +1,11 @@
 import time
 from urllib.parse import urlparse, urljoin
-
 from bs4 import BeautifulSoup
-import chromedriver_autoinstaller
-from selenium import webdriver
 import urllib.robotparser
+from playwright.sync_api import sync_playwright
+from typing import Optional, List
 
 from utils.config import Config
-
-chromedriver_autoinstaller.install()
 
 
 class DataFetcher:
@@ -20,6 +17,15 @@ class DataFetcher:
         self.max_depth = max_depth
         self.urls_visited = set()
         self.max_urls_to_search = max_urls_to_search
+        self.playwright = sync_playwright().start()
+        self.browser = self.playwright.firefox.launch(headless=True)
+
+    def __del__(self):
+      """Cleanup Playwright resources"""
+      if hasattr(self, 'browser'):
+          self.browser.close()
+      if hasattr(self, 'playwright'):
+          self.playwright.stop()
 
     def fetch_data(self, urls):
         """
@@ -42,69 +48,74 @@ class DataFetcher:
 
         return content
 
-    def crawl_website(self, start_urls):
-        """
-        Crawl website from start_url if permitted by robots.txt
-        """
+    def crawl_website(self, start_urls: List[str]) -> List[str]:
         urls_to_visit = [(url, 0) for url in start_urls]
         data = []
 
-        while len(urls_to_visit) > 0:
-            url, depth = urls_to_visit.pop(0)
-            domain = urlparse(url).netloc
+        try:
+            while len(urls_to_visit) > 0:
+                url, depth = urls_to_visit.pop(0)
+                domain = urlparse(url).netloc
 
-            if len(self.urls_visited) >= self.max_urls_to_search:
-                break
+                if len(self.urls_visited) >= self.max_urls_to_search:
+                    break
 
-            if url in self.urls_visited or depth > self.max_depth:
-                continue
+                if url in self.urls_visited or depth > self.max_depth:
+                    continue
 
-            if not self.is_allowed_by_robots(url):
-                self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
-                continue
+                if not self.is_allowed_by_robots(url):
+                    self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
+                    continue
 
-            soup = self.get_page(url)
-            if soup:
-                urls = self.get_urls_from_page(soup, url, domain, urls_to_visit)
-                urls_to_visit += [(url, depth + 1) for url in urls]
-                data.append(self.clean_data(soup))
-                self.urls_visited.add(url)
-                self.logger.debug(f"URL visited: {url}.")
+                soup = self.get_page(url)
+                if soup:
+                    urls = self.get_urls_from_page(soup, url, domain, urls_to_visit)
+                    urls_to_visit += [(url, depth + 1) for url in urls]
+                    data.append(self.clean_data(soup))
+                    self.urls_visited.add(url)
+                    self.logger.debug(f"URL visited: {url}.")
 
-            time.sleep(1)  # to avoid rate limiting
+                time.sleep(1)  # to avoid rate limiting
 
-        self.urls_visited.clear()
+        except Exception as e:
+            self.logger.error(f"Error during crawling: {e}")
+        finally:
+            self.urls_visited.clear()
+
         return data
 
-    def get_single_page_data(self, url):
+    def get_single_page_data(self, url: str) -> Optional[str]:
         """
-            Fetches data from a single URL if permitted by robots.txt
+        Fetches data from a single URL if permitted by robots.txt
         """
         if url in self.urls_visited:
-            return None
+          return None
 
         if not self.is_allowed_by_robots(url):
             self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
             return None
 
-        soup = self.get_page(url)
-        if soup:
-            self.urls_visited.add(url)
-            return self.clean_data(soup)
-        return None
+        try:
+            soup = self.get_page(url)
+            if soup:
+              self.urls_visited.add(url)
+              return self.clean_data(soup)
+        except Exception as e:
+            self.logger.error(f"Error fetching single page: {e}")
 
     def get_page(self, url):
-        driver = webdriver.Chrome()
-        page_source = None
-        try:
-            driver.implicitly_wait(10)
-            driver.get(url)
-            page_source = driver.page_source
-            return self.parse_html(page_source)
-        except Exception as e:
-            self.logger.error(f"An error occurred: {e}")
-        finally:
-            driver.quit()
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            try:
+                page.goto(url)
+                page_source = page.content()
+                return self.parse_html(page_source)
+            except Exception as e:
+                self.logger.error(f"An error occurred: {e}")
+                return None
+            finally:
+                browser.close()
 
     def parse_html(self, html_content):
         try:

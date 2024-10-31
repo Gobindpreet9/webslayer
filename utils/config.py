@@ -17,7 +17,7 @@ class Config:
 
     # ollama pull MODEL_ID before use
     MODEL_ID_PHI = "phi3:instruct"
-    MODEL_ID_LLAMA = "llama3.1:8b-instruct-q8_0"
+    MODEL_ID_LLAMA = "llama3.2:3b-instruct-q3_K_L"
     MODEL_MISTRAL = "mistral-nemo:12b-instruct-2407-q4_0"
     MODEL_GEMMA = "gemma2:27b-instruct-q3_K_M"
     FORBIDDEN_EVENTS_URL = "https://www.victoriabuzz.com/category/events/"

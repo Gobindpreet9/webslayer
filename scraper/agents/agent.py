@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 
 from langchain_anthropic import ChatAnthropic
@@ -8,6 +9,8 @@ from utils.config import Config, Model
 
 
 class Agent(ABC):
+    ollama_host = os.getenv('OLLAMA_HOST', 'ollama')
+    ollama_port = os.getenv('OLLAMA_PORT', '11434')
 
     def __init__(self, schema=None):
         self._schema = schema
@@ -65,6 +68,7 @@ class Agent(ABC):
                 )
         else:
             self.llm = Ollama(
+                base_url=f"http://{self.ollama_host}:{self.ollama_port}",
                 model=Config.LOCAL_MODEL,
                 num_ctx=8000,
                 temperature=0.4,
