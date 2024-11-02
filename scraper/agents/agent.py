@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 
 from langchain_anthropic import ChatAnthropic
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import OllamaLLM
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from utils.config import Config, Model
@@ -67,7 +67,7 @@ class Agent(ABC):
                     max_retries=2
                 )
         else:
-            self.llm = Ollama(
+            self.llm = OllamaLLM(
                 base_url=f"http://{self.ollama_host}:{self.ollama_port}",
                 model=Config.LOCAL_MODEL,
                 num_ctx=8000,

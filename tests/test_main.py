@@ -1,7 +1,7 @@
 import logging
 import unittest
 
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from schema.event_schema import EventSchema
 from scraper.agents.agent import Agent

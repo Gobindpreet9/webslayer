@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 import torch
-from langchain_core.pydantic_v1 import BaseModel
+from pydantic import BaseModel
 from langgraph.graph import StateGraph, END
 from typing_extensions import TypedDict
 
