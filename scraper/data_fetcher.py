@@ -104,18 +104,16 @@ class DataFetcher:
             self.logger.error(f"Error fetching single page: {e}")
 
     def get_page(self, url):
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page()
-            try:
-                page.goto(url)
-                page_source = page.content()
-                return self.parse_html(page_source)
-            except Exception as e:
-                self.logger.error(f"An error occurred: {e}")
-                return None
-            finally:
-                browser.close()
+        try:
+            page = self.browser.new_page()
+            page.goto(url)
+            page_source = page.content()
+            return self.parse_html(page_source)
+        except Exception as e:
+            self.logger.error(f"An error occurred: {e}")
+            return None
+        finally:
+            page.close()
 
     def parse_html(self, html_content):
         try:
