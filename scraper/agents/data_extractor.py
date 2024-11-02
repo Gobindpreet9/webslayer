@@ -78,9 +78,11 @@ class DataExtractorAgent(Agent):
         texts = []
         for document in state["documents"]:
             if Config.ENABLE_CHUNKING and len(document) > Config.CHUNKING_THRESHOLD:
-                texts.extend(text_splitter.create_documents([document]))
+                split_docs = text_splitter.create_documents([document])
+                texts.extend(split_docs)
+                state['logger'].debug("Chunked document into " + str(len(split_docs)) + " chunks.")
             else:
-                texts.extend(document)
+                texts.append(document)
 
         results = self.get_chain().batch(
             [{"data": document, "comments": state["comments"] or ""} for document in texts],

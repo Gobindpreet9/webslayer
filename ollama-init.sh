@@ -6,8 +6,8 @@
        sleep 5
    done
 
-   echo "Ollama is ready. Pulling llama2 model..."
+   echo "Ollama is ready. Pulling model..."
    curl -X POST http://ollama:11434/api/pull \
        -H "Content-Type: application/json" \
-       -d '{"name":"llama3.2:3b-instruct-q3_K_L"}' \
+       -d '{"name":"llama3.1:8b-instruct-q5_0"}' \
        --no-buffer

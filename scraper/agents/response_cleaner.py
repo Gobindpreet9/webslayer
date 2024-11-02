@@ -22,7 +22,7 @@ class ResponseCleanerAgent(Agent):
         Response generated (to be edited):
         {data}
     
-        schema instructions:
+        Format Instructions:
         {format_instructions}
     
         Please provide the cleaned and refined data in the format specified by the schema. If no valid entries remain 

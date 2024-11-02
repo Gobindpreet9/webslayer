@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def main(urls, schema):
-    scraper = Scraper(schema, urls, logger)
+    scraper = Scraper(schema, urls, logger, Config.CRAWL_WEBSITE, Config.CRAWL_MAX_DEPTH)
     extracted_data = scraper.extract()
     formatted_response = json.dumps(extracted_data, indent=4)
     logger.info(f"Response:\n{formatted_response}")

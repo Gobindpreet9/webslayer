@@ -17,7 +17,7 @@ class Config:
 
     # ollama pull MODEL_ID before use
     MODEL_ID_PHI = "phi3:instruct"
-    MODEL_ID_LLAMA = "llama3.2:3b-instruct-q3_K_L"
+    MODEL_ID_LLAMA = "llama3.1:8b-instruct-q5_0"
     MODEL_MISTRAL = "mistral-nemo:12b-instruct-2407-q4_0"
     MODEL_GEMMA = "gemma2:27b-instruct-q3_K_M"
     FORBIDDEN_EVENTS_URL = "https://www.victoriabuzz.com/category/events/"
@@ -37,14 +37,15 @@ class Config:
     # set_debug(DEBUG) # enables logs for langchain
 
     # Scraper configuration
-    CRAWL_WEBSITE = True
+    CRAWL_WEBSITE = False
     CRAWL_MAX_DEPTH = 2
     MAX_URLS_TO_SEARCH = 3
+    MAX_HALLUCINATION_CHECKS = 2
+    MAX_QUALITY_CHECKS = 2
     # Chunking provides better results for small local models with slower performance, use for larger models if required
-    ENABLE_CHUNKING = False if MODEL_TO_USE == Model.Ollama else False
+    ENABLE_CHUNKING = True if MODEL_TO_USE == Model.Ollama else False
     CHUNK_SIZE = 5000  # Split documents into chunks if too large
     CHUNK_OVERLAP_SIZE = 100
     CHUNKING_THRESHOLD = 5000  # Split documents if larger than CHUNKING_THRESHOLD
     URLS = [PHILOSOPHY_URL]
     SCHEMA = Philosophers
-    # todo: add max hallucination check count and quality check count configuration
