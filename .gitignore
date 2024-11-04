@@ -1,2 +1,5 @@
 /webslayer-logs.log
 /tests/webslayer-logs.log
+venv/*
+*.pyc
+launch.json

@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from scraper.agents.agent import Agent
 from utils.config import Config
-from utils.utils import Utils
+from core.utils import Utils
 
 
 class HallucinationGraderSchema(BaseModel):

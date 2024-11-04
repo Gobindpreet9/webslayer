@@ -6,6 +6,7 @@ from schema.event_schema import EventsSchema
 from langchain.globals import set_debug
 from schema.philosophers_schema import Philosophers
 
+# TODO: FILE TO BE REMOVED AS TRANSITION TO AN API 
 
 class Model(Enum):
     Ollama = 'ollama'

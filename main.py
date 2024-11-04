@@ -1,20 +1,40 @@
-from schema.event_schema import EventsSchema
-from scraper.scraper import Scraper
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 import logging
-from utils.config import Config
-from utils.utils import Utils
-import json
+import uvicorn
+
+from api.routes import schema_router, scraping_router
+from core.settings import Settings
+from core.utils import Utils
+
+settings = Settings()
 
 logger = logging.getLogger(__name__)
+Utils.setup_logging(logger, settings.DEBUG)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting up WebSlayer API")
+    yield
+    logger.info("Shutting down WebSlayer API")
 
-def main(urls, schema):
-    scraper = Scraper(schema, urls, logger, Config.CRAWL_WEBSITE, Config.CRAWL_MAX_DEPTH)
-    extracted_data = scraper.extract()
-    formatted_response = json.dumps(extracted_data, indent=4)
-    logger.info(f"Response:\n{formatted_response}")
+# Initialize FastAPI with lifespan
+app = FastAPI(
+    title=settings.APP_TITLE,
+    version=settings.APP_VERSION,
+    description=settings.APP_DESCRIPTION,
+    lifespan=lifespan,
+    servers=[]
+)
 
+# Include routers
+app.include_router(schema_router, prefix="/webslayer")
+app.include_router(scraping_router, prefix="/webslayer")
 
 if __name__ == "__main__":
-    Utils.setup_logging(logger)
-    main(Config.URLS, Config.SCHEMA)
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG
+    )
