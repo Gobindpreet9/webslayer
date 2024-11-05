@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-
+    POSTGRES_PASSWORD: str = ""
+    
     class Config:
         env_file = ".env"
