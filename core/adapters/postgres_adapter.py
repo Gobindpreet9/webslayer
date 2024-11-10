@@ -41,7 +41,7 @@ class PostgresAdapter(DataAdapterInterface):
                 detail=f"Database error: {str(e)}"
             )
 
-    async def create_schema(self, db: AsyncSession, schema: SchemaDefinitionPydantic) -> SchemaDefinitionPydantic:
+    async def upsert_schema(self, db: AsyncSession, schema: SchemaDefinitionPydantic) -> SchemaDefinitionPydantic:
         try:
             async with db.begin():
                 db_schema = SchemaDefinition(
@@ -51,9 +51,7 @@ class PostgresAdapter(DataAdapterInterface):
                         for field in schema.fields
                     ]
                 )
-                db.add(db_schema)
-                await db.flush()
-                await db.refresh(db_schema, attribute_names=["fields"])
+                db_schema = await db.merge(db_schema)
                 return db_schema.to_pydantic()
         except Exception as e:
             raise HTTPException(

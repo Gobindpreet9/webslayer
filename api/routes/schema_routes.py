@@ -40,7 +40,7 @@ async def get_schema(schema_name: str, db: AsyncSession = Depends(get_db)):
 async def register_schema(schema_def: SchemaDefinition, db: AsyncSession = Depends(get_db)):
     """Adds a new schema definition or updates an existing one"""
     adapter = PostgresAdapter()
-    return await adapter.create_schema(db, schema_def)
+    return await adapter.upsert_schema(db, schema_def)
 
 @router.delete("/{schema_name}")
 async def delete_schema(schema_name: str, db: AsyncSession = Depends(get_db)):

@@ -17,8 +17,8 @@ class DataAdapterInterface(ABC):
         pass
     
     @abstractmethod
-    async def create_schema(self, db: AsyncSession, schema: SchemaDefinition) -> SchemaDefinition:
-        """Create a new schema"""
+    async def upsert_schema(self, db: AsyncSession, schema: SchemaDefinition) -> SchemaDefinition:
+        """Create a new schema or update an existing one"""
         pass
     
     @abstractmethod
