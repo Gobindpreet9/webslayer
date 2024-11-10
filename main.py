@@ -6,6 +6,7 @@ import uvicorn
 from api.routes import schema_router, scraping_router
 from core.settings import Settings
 from core.utils import Utils
+from core.database.postgres_database import db
 
 settings = Settings()
 
@@ -17,6 +18,7 @@ async def lifespan(app: FastAPI):
     logger.info("Starting up WebSlayer API")
     yield
     logger.info("Shutting down WebSlayer API")
+    await db.shutdown()
 
 # Initialize FastAPI with lifespan
 app = FastAPI(
