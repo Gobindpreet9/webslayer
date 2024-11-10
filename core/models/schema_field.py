@@ -1,6 +1,7 @@
 from enum import Enum
 from sqlalchemy import String, Boolean, JSON, Index, Enum as SQLAlchemyEnum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from api.models import SchemaDefinition
 from core.models.base import TimestampMixin
 from core.database.postgres_database import Base
 
@@ -43,7 +44,7 @@ class SchemaField(Base, TimestampMixin):
     )
     default_value: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    schema_definition: Mapped["SchemaDefinition"] = relationship(
+    schema_definition: Mapped[SchemaDefinition] = relationship(
         "SchemaDefinition",
         back_populates="fields"
     )
