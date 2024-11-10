@@ -1,23 +1,23 @@
 from pydantic import BaseModel, Field
-from enum import Enum
 from typing import List, Optional, Any
+from enum import Enum
 
-class FieldType(str, Enum):
-    STRING = "string"
-    INTEGER = "integer"
-    FLOAT = "float"
-    BOOLEAN = "boolean"
-    LIST = "list"
-    DICT = "dict"
-    DATE = "date"
+class FieldTypePydantic(str, Enum):
+    string = "string"
+    integer = "integer"
+    float = "float"
+    boolean = "boolean"
+    list = "list"
+    dict = "dict"
+    date = "date"
 
 class SchemaField(BaseModel):
     name: str
-    field_type: FieldType
+    field_type: FieldTypePydantic
     description: Optional[str] = None
     required: bool = True
-    list_item_type: Optional[FieldType] = None
-    default: Optional[Any] = None
+    list_item_type: Optional[FieldTypePydantic] = None
+    default_value: Optional[Any] = None
 
 class SchemaDefinition(BaseModel):
     name: str
