@@ -25,5 +25,7 @@ COPY . .
 
 RUN chown -R appuser:appuser /app
 
+EXPOSE 8000
+
 # Command to run the application
 CMD ["python", "main.py"]

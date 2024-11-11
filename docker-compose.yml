@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   webslayer:
     build: .
+    ports:
+      - "8000:8000"
     volumes:
       - webslayer_data:/webslayer
     networks:
@@ -12,6 +12,10 @@ services:
         condition: service_started
       ollama-init:
         condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   # https://hub.docker.com/r/ollama/ollama instructions how to enable GPU
   ollama:
@@ -42,6 +46,47 @@ services:
       - ./ollama-init.sh:/ollama-init.sh
     command: sh /ollama-init.sh
 
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: webslayer_db
+      POSTGRES_USER: webslayer_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webslayer_user -d webslayer_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    networks:
+      - app-network
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    build: .
+    command: celery -A core.celery_app worker --loglevel=info
+    volumes:
+      - webslayer_data:/webslayer
+    networks:
+      - app-network
+    depends_on:
+      redis:
+        condition: service_started
+      ollama:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+
 networks:
   app-network:
     driver: bridge
@@ -49,3 +94,4 @@ networks:
 volumes:
   ollama_data:
   webslayer_data:
+  postgres_data:
