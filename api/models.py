@@ -11,6 +11,10 @@ class FieldTypePydantic(str, Enum):
     dict = "dict"
     date = "date"
 
+class ModelType(str, Enum):
+    ollama = "Ollama"
+    claude = "Claude"
+
 class SchemaField(BaseModel):
     name: str
     field_type: FieldTypePydantic
@@ -38,7 +42,11 @@ class ScraperConfig(BaseModel):
 class JobRequest(BaseModel):
     urls: List[str]
     schema_name: str
-    llm_model: str = Field(
+    model_type: ModelType = Field(
+        default=ModelType.ollama,
+        description="Type of model to use for processing (Ollama or Claude)"
+    )
+    local_model_name: str = Field(
         default="llama3.1:8b-instruct-q5_0",
         description="Name of the LLM model to use for processing. For Ollama only."
     )

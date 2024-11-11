@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "webslayer_db"
     POSTGRES_HOST: str = "postgres"
     POSTGRES_PORT: int = 5432
+    CELERY_BROKER_URL: str = "redis://redis:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://redis:6379/0"
+    OLLAMA_HOST: str = 'ollama'
+    OLLAMA_PORT: int = 11434
     
     @property
     def database_url(self) -> str:

@@ -1,18 +1,18 @@
-import os
 from abc import ABC, abstractmethod
 
+from api.models import ModelType
 from langchain_anthropic import ChatAnthropic
 from langchain_ollama import OllamaLLM
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
-from utils.config import Config, Model
+from core.settings import Settings
 
+settings = Settings()
 
 class Agent(ABC):
-    ollama_host = os.getenv('OLLAMA_HOST', 'ollama')
-    ollama_port = os.getenv('OLLAMA_PORT', '11434')
-
-    def __init__(self, schema=None):
+    def __init__(self, model_type, local_model_name, schema=None):
+        self.model_type = model_type
+        self.local_model_name = local_model_name
         self._schema = schema
         self.parser = None
         self.llm = None
@@ -58,7 +58,7 @@ class Agent(ABC):
         """
             Method configures the LLM instance. The default LLM is llama3.
         """
-        if Config.MODEL_TO_USE == Model.Anthropic:
+        if self.model_type == ModelType.claude:
             self.llm = ChatAnthropic(
                     model="claude-3-5-sonnet-20240620",
                     temperature=0,
@@ -68,8 +68,8 @@ class Agent(ABC):
                 )
         else:
             self.llm = OllamaLLM(
-                base_url=f"http://{self.ollama_host}:{self.ollama_port}",
-                model=Config.LOCAL_MODEL,
+                base_url=f"http://{settings.OLLAMA_HOST}:{settings.OLLAMA_PORT}",
+                model=self.local_model_name,
                 num_ctx=8000,
                 temperature=0.4,
                 format='json'

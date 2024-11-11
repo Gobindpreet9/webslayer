@@ -1,4 +1,7 @@
 import logging
+from pydantic import BaseModel, create_model, Field
+from typing import Dict, Any, Type
+from datetime import date
 
 from core.settings import Settings
 
@@ -43,3 +46,40 @@ class Utils:
         logger.addHandler(console_handler)
 
         logger.propagate = True
+
+    @staticmethod
+    def create_dynamic_model(schema_def: Dict[str, Any]) -> Type[BaseModel]:
+        """
+        Creates a Pydantic model dynamically from a schema definition
+        """
+        TYPE_MAP = {
+            "string": str,
+            "integer": int,
+            "float": float,
+            "boolean": bool,
+            "list": list,
+            "dict": dict,
+            "date": date,
+            # Add other mappings as necessary
+        }
+
+        fields = {}
+        for field in schema_def['fields']:
+            field_type_str = field['field_type'].lower()
+            field_type = TYPE_MAP.get(field_type_str)
+
+            if not field_type:
+                raise ValueError(f"Unsupported field type: {field_type_str}")
+
+            fields[field['name']] = (
+                field_type,
+                Field(
+                    default=field.get('default_value'),
+                    description=field.get('description'),
+                )
+            )
+        
+        return create_model(
+            schema_def['name'],
+            **fields
+        )

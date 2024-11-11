@@ -29,8 +29,8 @@ class ResponseCleanerAgent(Agent):
         after cleaning, return an empty list or appropriate empty structure as defined by the schema.
     """
 
-    def __init__(self, schema):
-        super().__init__(schema=schema)
+    def __init__(self, model_type, local_model_name, schema):
+        super().__init__(model_type=model_type, local_model_name=local_model_name, schema=schema)
 
     @property
     def prompt(self):

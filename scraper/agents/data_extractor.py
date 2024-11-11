@@ -3,9 +3,6 @@ import json
 from scraper.agents.agent import Agent
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from utils.config import Config
-
-
 class DataExtractorAgent(Agent):
     """
     Agent class for extracting data from web data.
@@ -27,8 +24,11 @@ class DataExtractorAgent(Agent):
         {comments}
         """
 
-    def __init__(self, schema):
-        super().__init__(schema=schema)
+    def __init__(self, model_type, local_model_name, schema, enable_chunking, chunk_size, chunk_overlap_size):
+        super().__init__(model_type=model_type, local_model_name=local_model_name, schema=schema)
+        self.enable_chunking = enable_chunking
+        self.chunk_size = chunk_size
+        self.chunk_overlap_size = chunk_overlap_size
 
     @property
     def prompt(self):
@@ -71,13 +71,13 @@ class DataExtractorAgent(Agent):
         state['logger'].info("Extracting data using LLM.")
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=Config.CHUNK_SIZE,
-            chunk_overlap=Config.CHUNK_OVERLAP_SIZE,
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap_size,
             length_function=len,
         )
         texts = []
         for document in state["documents"]:
-            if Config.ENABLE_CHUNKING and len(document) > Config.CHUNKING_THRESHOLD:
+            if self.enable_chunking and len(document) > self.chunk_size:
                 split_docs = text_splitter.create_documents([document])
                 texts.extend(split_docs)
                 state['logger'].debug("Chunked document into " + str(len(split_docs)) + " chunks.")

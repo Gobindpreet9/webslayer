@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
 from scraper.agents.agent import Agent
-from utils.config import Config
 from core.utils import Utils
 
 
@@ -19,7 +18,6 @@ class HallucinationGraderAgent(Agent):
     """
     Agent to evaluate the response based on provided data to identify any hallucinations.
     """
-    MAX_HALLUCINATION_CHECKS = Config.MAX_HALLUCINATION_CHECKS
     PROMPT_TEMPLATE = """
        You are tasked with evaluating the provided document content to identify any hallucinations, which are instances
         of incorrect, misleading, or fabricated information. Your response should strictly adhere to the requested JSON 
@@ -38,6 +36,10 @@ class HallucinationGraderAgent(Agent):
         {format_instructions}
     """
 
+    def __init__(self, model_type, local_model_name, max_hallucination_checks):
+        super().__init__(model_type=model_type, local_model_name=local_model_name)
+        self.max_hallucination_checks = max_hallucination_checks
+
     @property
     def prompt(self):
         return self.PROMPT_TEMPLATE
@@ -48,7 +50,7 @@ class HallucinationGraderAgent(Agent):
 
     def act(self, state):
         state['logger'].info("Checking for hallucinations.")
-        if state["hallucination_check_count"] >= self.MAX_HALLUCINATION_CHECKS:
+        if state["hallucination_check_count"] >= self.max_hallucination_checks:
             state['logger'].debug(f"---MAX HALLUCINATION CHECKS REACHED. PROCEEDING TO QUALITY CHECK.---")
             return {
                 **state,

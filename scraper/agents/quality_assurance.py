@@ -1,18 +1,14 @@
 from pydantic import BaseModel, Field
 from typing import List
 from scraper.agents.agent import Agent
-from utils.config import Config
 from core.utils import Utils
-
-MAX_QUALITY = Config.MAX_QUALITY_CHECKS
-
 
 class QualityAssuranceSchema(BaseModel):
     """
     Schema for the quality assessment.
     """
     quality: int = Field(default=0,
-                         description=f"Overall quality score of the document content on a scale from 1 to {MAX_QUALITY}.")
+                         description=f"Overall quality score of the document content on a scale from 1 to 10.")
     comments: List[str] = Field(default=[], description="Specific comments or feedback regarding the document content.")
 
 
@@ -20,7 +16,6 @@ class QualityAssuranceAgent(Agent):
     """
     Agent to evaluate the quality of the generated content based on provided document and schema.
     """
-    MAX_QUALITY_CHECKS = 2
     PROMPT_TEMPLATE = """
         You are tasked with evaluating the provided document content based on overall quality and providing specific 
         comments or feedback. Your response should strictly adhere to the requested JSON output format and should not 
@@ -36,6 +31,10 @@ class QualityAssuranceAgent(Agent):
         Here is the quality assessment: {response}
     """
 
+    def __init__(self, model_type, local_model_name, max_quality_checks):
+        super().__init__(model_type=model_type, local_model_name=local_model_name)
+        self.max_quality_checks = max_quality_checks
+
     @property
     def prompt(self):
         return self.PROMPT_TEMPLATE
@@ -46,10 +45,10 @@ class QualityAssuranceAgent(Agent):
 
     def act(self, state):
         state['logger'].info("Checking response quality.")
-        if state["quality_check_count"] >= self.MAX_QUALITY_CHECKS:
+        if state["quality_check_count"] >= self.max_quality_checks:
             state['logger'].info(f"---MAX QUALITY CHECKS REACHED. FINISHING.---")
-            state["quality"] = MAX_QUALITY
-            return {**state, "quality": MAX_QUALITY}
+            state["quality"] = 10
+            return {**state, "quality": 10}
 
         response = self.get_chain().invoke({"document_content": state["documents"], "response": state["generation"]})
         quality = Utils.get_value_or_default(response, "quality", 10, state["logger"])

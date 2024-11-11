@@ -1,33 +1,34 @@
-import time
+from typing import Optional, List
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import urllib.robotparser
-from playwright.sync_api import sync_playwright
-from typing import Optional, List
-
-from utils.config import Config
-
+from playwright.async_api import async_playwright
+import asyncio
 
 class DataFetcher:
-    def __init__(self, logger, should_crawl=Config.CRAWL_WEBSITE, max_depth=Config.CRAWL_MAX_DEPTH,
-                 max_urls_to_search=Config.MAX_URLS_TO_SEARCH):
+    def __init__(self, logger, should_crawl, max_depth, max_urls_to_search):
         self.validators = {}
         self.logger = logger
         self.should_crawl = should_crawl
         self.max_depth = max_depth
         self.urls_visited = set()
         self.max_urls_to_search = max_urls_to_search
-        self.playwright = sync_playwright().start()
-        self.browser = self.playwright.firefox.launch(headless=True)
+        self.playwright = None
+        self.browser = None
+        asyncio.create_task(self.initialize_playwright())
 
-    def __del__(self):
-      """Cleanup Playwright resources"""
-      if hasattr(self, 'browser'):
-          self.browser.close()
-      if hasattr(self, 'playwright'):
-          self.playwright.stop()
+    async def initialize_playwright(self):
+        self.playwright = await async_playwright().start()
+        self.browser = await self.playwright.firefox.launch(headless=True)
 
-    def fetch_data(self, urls):
+    async def __del__(self):
+        """Cleanup Playwright resources"""
+        if self.browser:
+            await self.browser.close()
+        if self.playwright:
+            await self.playwright.stop()
+
+    async def fetch_data(self, urls):
         """
         Gets data from a list of urls if permitted by robots.txt
         """
@@ -37,18 +38,18 @@ class DataFetcher:
 
         content = []
         if self.should_crawl:
-            data = self.crawl_website(urls)
+            data = await self.crawl_website(urls)
             if data:
                 content = data
         else:
             for url in urls:
-                data = self.get_single_page_data(url)
+                data = await self.get_single_page_data(url)
                 if data:
                     content.append(data)
 
         return content
 
-    def crawl_website(self, start_urls: List[str]) -> List[str]:
+    async def crawl_website(self, start_urls: List[str]) -> List[str]:
         urls_to_visit = [(url, 0) for url in start_urls]
         data = []
 
@@ -67,7 +68,7 @@ class DataFetcher:
                     self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
                     continue
 
-                soup = self.get_page(url)
+                soup = await self.get_page(url)
                 if soup:
                     urls = self.get_urls_from_page(soup, url, domain, urls_to_visit)
                     urls_to_visit += [(url, depth + 1) for url in urls]
@@ -75,7 +76,7 @@ class DataFetcher:
                     self.urls_visited.add(url)
                     self.logger.debug(f"URL visited: {url}.")
 
-                time.sleep(1)  # to avoid rate limiting
+                await asyncio.sleep(1)  # to avoid rate limiting
 
         except Exception as e:
             self.logger.error(f"Error during crawling: {e}")
@@ -84,36 +85,36 @@ class DataFetcher:
 
         return data
 
-    def get_single_page_data(self, url: str) -> Optional[str]:
+    async def get_single_page_data(self, url: str) -> Optional[str]:
         """
         Fetches data from a single URL if permitted by robots.txt
         """
         if url in self.urls_visited:
-          return None
+            return None
 
         if not self.is_allowed_by_robots(url):
             self.logger.debug(f"Access denied for {url}. Please check the robots.txt file.")
             return None
 
         try:
-            soup = self.get_page(url)
+            soup = await self.get_page(url)
             if soup:
-              self.urls_visited.add(url)
-              return self.clean_data(soup)
+                self.urls_visited.add(url)
+                return self.clean_data(soup)
         except Exception as e:
             self.logger.error(f"Error fetching single page: {e}")
 
-    def get_page(self, url):
+    async def get_page(self, url):
         try:
-            page = self.browser.new_page()
-            page.goto(url)
-            page_source = page.content()
-            return self.parse_html(page_source)
+            page = await self.browser.new_page()
+            await page.goto(url)
+            page_source = await page.content()
+            soup = self.parse_html(page_source)
+            await page.close()
+            return soup
         except Exception as e:
             self.logger.error(f"An error occurred: {e}")
             return None
-        finally:
-            page.close()
 
     def parse_html(self, html_content):
         try:
@@ -144,7 +145,7 @@ class DataFetcher:
            """
         text_parts = []
         for element in soup.descendants:
-            if element.name in tags:
+            if hasattr(element, 'name') and element.name in tags:
                 if element.name == "a":
                     href = element.get('href')
                     if href:
@@ -200,7 +201,7 @@ class DataFetcher:
         if url is None:
             return None
         robots = urllib.robotparser.RobotFileParser()
-        parsed_url = urllib.parse.urlparse(url)
+        parsed_url = urlparse(url)
         base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/"
         try:
             if self.validators.get(base_url) is None:

@@ -11,6 +11,8 @@ from scraper.agents.hallucination_grader import HallucinationGraderAgent
 from scraper.agents.quality_assurance import QualityAssuranceAgent
 from scraper.agents.response_cleaner import ResponseCleanerAgent
 from scraper.data_fetcher import DataFetcher
+from core.utils import Utils
+import asyncio
 
 
 class GraphState(TypedDict):
@@ -53,18 +55,24 @@ class Scraper:
         schema: schema model of the response
         urls_to_search: list of URLs to search
         logger: logger
-        crawl_website: whether to crawl the urls
-        crawl_max_depth: maximum depth to crawl
+        crawl_config: configuration for the crawler
+        scraper_config: configuration for the scraper
     """
-    def __init__(self, schema, urls_to_search, logger, crawl_website=False, crawl_max_depth=3):
+    def __init__(self, schema, urls_to_search, model_type, local_model_name, logger, crawl_config, scraper_config):
         self.logger = logger
-        self.crawl_website = crawl_website
-        self.crawl_max_depth = crawl_max_depth
+        self.crawl_config = crawl_config
+        self.scraper_config = scraper_config
+        self.model_type = model_type
+        self.local_model_name = local_model_name
+        
+        # Create dynamic model from schema definition
+        if isinstance(schema, dict):
+            schema = Utils.create_dynamic_model(schema)
+        
         self.state = GraphState(
             schema=schema,
             question="",
             generation="",
-            crawl_website=crawl_website,
             urls_to_search=urls_to_search,
             comments=[],
             documents=[],
@@ -76,25 +84,36 @@ class Scraper:
         )
         # Clear GPU cache before running the model
         torch.cuda.empty_cache()
-        self.state["documents"] = self.fetch_data()
 
     def set_schema(self, schema):
         self.state.schema = schema
 
-    def fetch_data(self):
-        self.logger.info(f"Getting data from {self.state['urls_to_search']}.")
-        fetcher = DataFetcher(self.logger, self.crawl_website, self.crawl_max_depth)
-        docs = fetcher.fetch_data(self.state['urls_to_search'])
-        self.logger.debug(f"Scraped data:\n{docs}")
-        return docs
+    @classmethod
+    async def create(cls, schema, urls_to_search, model_type, local_model_name, logger, crawl_config, scraper_config):
+        self = cls(schema, urls_to_search, model_type, local_model_name, logger, crawl_config, scraper_config)
+        await self.initialize_fetcher()
+        return self
 
-    def extract(self):
+    async def initialize_fetcher(self):
+        self.fetcher = DataFetcher(
+            self.logger,
+            self.crawl_config.get('enable_crawling', False),
+            self.crawl_config.get('max_depth', 3),
+            self.crawl_config.get('max_urls_to_search', 100)
+        )
+        await asyncio.sleep(0.1)  # Yield control to ensure DataFetcher initializes asynchronously
+
+    async def fetch_data(self):
+        return await self.fetcher.fetch_data(self.state.get("urls_to_search", []))
+
+    async def extract(self):
         """
             Extracts data from a document using an extraction team.
 
             Returns:
-                dict: The extracted data.
+                str: The extracted generation text.
             """
+        self.state["documents"] = await self.fetch_data()
         extraction_team = self.init_extraction_team()
         graph = extraction_team.compile()
         extracted_data = graph.invoke(self.state)
@@ -106,10 +125,26 @@ class Scraper:
         :return: The initialized extraction team.
         """
         # Initialize agents
-        data_extractor_agent = DataExtractorAgent(schema=self.state["schema"])
-        response_cleaner_agent = ResponseCleanerAgent(schema=self.state["schema"])
-        hallucination_grader_agent = HallucinationGraderAgent()
-        quality_assurance_agent = QualityAssuranceAgent()
+        data_extractor_agent = DataExtractorAgent(
+            model_type=self.model_type,
+            local_model_name=self.local_model_name,
+            schema=self.state["schema"], 
+            enable_chunking=self.scraper_config.get('enable_chunking', True), 
+            chunk_size=self.scraper_config.get('chunk_size', 6000), 
+            chunk_overlap_size=self.scraper_config.get('chunk_overlap', 150)
+        )
+        response_cleaner_agent = ResponseCleanerAgent(
+            model_type=self.model_type,
+            local_model_name=self.local_model_name,
+            schema=self.state["schema"])
+        hallucination_grader_agent = HallucinationGraderAgent(
+            model_type=self.model_type,
+            local_model_name=self.local_model_name,
+            max_hallucination_checks=self.scraper_config.get('max_hallucination_checks', 2))
+        quality_assurance_agent = QualityAssuranceAgent(
+            model_type=self.model_type,
+            local_model_name=self.local_model_name,
+            max_quality_checks=self.scraper_config.get('max_quality_checks', 2))
 
         workflow = StateGraph(GraphState)
 

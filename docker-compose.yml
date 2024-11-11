@@ -14,6 +14,8 @@ services:
         condition: service_completed_successfully
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   # https://hub.docker.com/r/ollama/ollama instructions how to enable GPU
   ollama:
@@ -62,6 +64,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:alpine
+    networks:
+      - app-network
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    build: .
+    command: celery -A core.celery_app worker --loglevel=info
+    volumes:
+      - webslayer_data:/webslayer
+    networks:
+      - app-network
+    depends_on:
+      redis:
+        condition: service_started
+      ollama:
+        condition: service_started
+      postgres:
+        condition: service_healthy
 
 networks:
   app-network:
