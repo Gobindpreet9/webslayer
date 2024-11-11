@@ -29,7 +29,8 @@ class ScraperTask(Task):
 def scrape_urls(self, schema, urls, model_type, local_model_name, crawl_config, scraper_config):
     try:
         logger.info(f"Starting scraping task with config: model_type={model_type}, urls={urls}")
-        scraper = asyncio.run(Scraper.create(
+        loop = asyncio.get_event_loop()
+        scraper = loop.run_until_complete(Scraper.create(
             schema=schema,
             urls_to_search=urls,
             model_type=model_type,
@@ -38,7 +39,7 @@ def scrape_urls(self, schema, urls, model_type, local_model_name, crawl_config, 
             crawl_config=crawl_config,
             scraper_config=scraper_config
         ))
-        report = asyncio.run(scraper.extract())
+        report = loop.run_until_complete(scraper.extract())
         logger.info(f"Scraping completed successfully")
         logger.debug(f"Scraping result: {report}")
         return {

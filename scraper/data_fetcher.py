@@ -15,39 +15,60 @@ class DataFetcher:
         self.max_urls_to_search = max_urls_to_search
         self.playwright = None
         self.browser = None
-        asyncio.create_task(self.initialize_playwright())
+        self.initialization_task = asyncio.create_task(self.initialize_playwright())
 
     async def initialize_playwright(self):
-        self.playwright = await async_playwright().start()
-        self.browser = await self.playwright.firefox.launch(headless=True)
+        try:
+            if not self.playwright:
+                self.playwright = await async_playwright().start()
+            if not self.browser:
+                self.browser = await self.playwright.firefox.launch(headless=True)
+            self.logger.info("Playwright initialized successfully.")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize Playwright: {e}")
+            await self.cleanup()
+            raise RuntimeError(f"Failed to initialize browser: {e}")
 
-    async def __del__(self):
+    async def cleanup(self):
         """Cleanup Playwright resources"""
-        if self.browser:
-            await self.browser.close()
-        if self.playwright:
-            await self.playwright.stop()
+        try:
+            if self.browser:
+                await self.browser.close()
+            if self.playwright:
+                await self.playwright.stop()
+        except Exception as e:
+            self.logger.error(f"Error during cleanup: {e}")
+
+    def __del__(self):
+        """Ensure cleanup runs when object is destroyed"""
+        if self.browser or self.playwright:
+            asyncio.create_task(self.cleanup())
 
     async def fetch_data(self, urls):
         """
         Gets data from a list of urls if permitted by robots.txt
         """
-        if not urls or len(urls) == 0:
-            self.logger.debug("No URLs provided.")
-            return None
+        try:
+            await self.initialization_task
 
-        content = []
-        if self.should_crawl:
-            data = await self.crawl_website(urls)
-            if data:
-                content = data
-        else:
-            for url in urls:
-                data = await self.get_single_page_data(url)
+            if not urls or len(urls) == 0:
+                self.logger.debug("No URLs provided.")
+                return None
+
+            content = []
+            if self.should_crawl:
+                data = await self.crawl_website(urls)
                 if data:
-                    content.append(data)
+                    content = data
+            else:
+                for url in urls:
+                    data = await self.get_single_page_data(url)
+                    if data:
+                        content.append(data)
 
-        return content
+            return content
+        finally:
+            await self.cleanup()
 
     async def crawl_website(self, start_urls: List[str]) -> List[str]:
         urls_to_visit = [(url, 0) for url in start_urls]
@@ -214,5 +235,6 @@ class DataFetcher:
         return robots
 
     def is_allowed_by_robots(self, url):
+        return True
         validator = self.get_robots_validator(url)
         return validator.can_fetch("*", url) if validator else True

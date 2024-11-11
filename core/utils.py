@@ -45,7 +45,7 @@ class Utils:
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)
 
-        logger.propagate = True
+        logger.propagate = False
 
     @staticmethod
     def create_dynamic_model(schema_def: Dict[str, Any]) -> Type[BaseModel]:
