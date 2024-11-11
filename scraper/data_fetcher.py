@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import urllib.robotparser
 from playwright.async_api import async_playwright
 import asyncio
+from core.settings import Settings
+settings = Settings()
 
 class DataFetcher:
     def __init__(self, logger, should_crawl, max_depth, max_urls_to_search):
@@ -235,6 +237,7 @@ class DataFetcher:
         return robots
 
     def is_allowed_by_robots(self, url):
-        return True
+        if settings.IGNORE_ROBOTS:
+            return True
         validator = self.get_robots_validator(url)
         return validator.can_fetch("*", url) if validator else True

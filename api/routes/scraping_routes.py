@@ -11,29 +11,43 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
+async def get_schema_dict(db: AsyncSession, schema_name: str, return_as_list: bool = False) -> dict:
+    """
+    Gets a schema from the database in a dictionary format, optionally wrapping it in a list structure.
+    """
+    adapter = PostgresAdapter()
+    schema = await adapter.get_schema_by_name(db, schema_name)
+    
+    base_schema = schema.to_dict()
+    
+    if not return_as_list:
+        return base_schema
+        
+    return {
+        "name": f"{schema.name}_list",
+        "fields": [
+            {
+                "name": schema.name,
+                "field_type": "list",
+                "description": f"List of {schema.name} items",
+                "required": True,
+                "list_item_type": "schema",
+                "item_schema": {
+                    "name": schema.name,
+                    "fields": base_schema["fields"]
+                }
+            }
+        ]
+    }
+
 @router.post("/start")
 async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db)):
     """Start a new scraping job"""
     try:
-        adapter = PostgresAdapter()
-        schema = await adapter.get_schema_by_name(db, job_request.schema_name)
-        
         crawl_config = job_request.crawl_config.model_dump()
         scraper_config = job_request.scraper_config.model_dump()
-        schema_dict = {
-            "name": schema.name,
-            "fields": [
-            {
-                "name": field.name,
-                "field_type": field.field_type,
-                "description": field.description,
-                "required": field.required,
-                "list_item_type": field.list_item_type,
-                "default_value": field.default_value
-            }
-            for field in schema.fields
-            ]
-        }
+        
+        schema_dict = await get_schema_dict(db, job_request.schema_name, job_request.return_schema_list)
 
         # Start Celery task
         task = scrape_urls.delay(

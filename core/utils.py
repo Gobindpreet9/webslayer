@@ -1,9 +1,10 @@
 import logging
-from pydantic import BaseModel, create_model, Field
-from typing import Dict, Any, Type
+from typing import Dict, Any, Type, List
 from datetime import date
+from pydantic import BaseModel
+from pydantic.fields import Field
+from pydantic.main import create_model
 
-from core.settings import Settings
 
 class Utils:
     LOG_FILE_NAME: str = "webslayer-logs.log"
@@ -57,28 +58,56 @@ class Utils:
             "integer": int,
             "float": float,
             "boolean": bool,
-            "list": list,
-            "dict": dict,
+            "list": List,
             "date": date,
-            # Add other mappings as necessary
+            "schema": Dict[str, Any],
         }
 
-        fields = {}
-        for field in schema_def['fields']:
-            field_type_str = field['field_type'].lower()
+        def create_field_model(field_def):
+            field_type_str = field_def['field_type'].lower()
+            list_item_type = field_def.get('list_item_type', None)
             field_type = TYPE_MAP.get(field_type_str)
 
             if not field_type:
                 raise ValueError(f"Unsupported field type: {field_type_str}")
 
-            fields[field['name']] = (
+            if field_type_str == 'list' and list_item_type == 'schema':
+                if 'item_schema' not in field_def:
+                    raise ValueError("item_schema is required for list type with list_item_type 'schema'")
+                
+                inner_model = create_model(
+                    f"{field_def['item_schema']['name']}Item",
+                    **{
+                        field['name']: (
+                            TYPE_MAP.get(field['field_type'].lower()),
+                            Field(
+                                default=field.get('default_value'),
+                                description=field.get('description'),
+                            )
+                        )
+                        for field in field_def['item_schema']['fields']
+                    }
+                )
+                return (
+                    List[inner_model],
+                    Field(
+                        default=field_def.get('default_value'),
+                        description=field_def.get('description'),
+                    )
+                )
+
+            return (
                 field_type,
                 Field(
-                    default=field.get('default_value'),
-                    description=field.get('description'),
+                    default=field_def.get('default_value'),
+                    description=field_def.get('description'),
                 )
             )
-        
+
+        fields = {}
+        for field in schema_def['fields']:
+            fields[field['name']] = create_field_model(field)
+
         return create_model(
             schema_def['name'],
             **fields

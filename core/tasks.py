@@ -47,13 +47,8 @@ def scrape_urls(self, schema, urls, model_type, local_model_name, crawl_config, 
             'result': report
         }
     except Exception as e:
-        import traceback
-        logger.error(f"Error in scraping task: {str(e)}")
-        logger.error(f"Error type: {type(e).__name__}")
-        logger.error(f"Traceback:\n{traceback.format_exc()}")
         return {
             'status': 'failed',
             'error': str(e),
             'error_type': type(e).__name__,
-            'traceback': traceback.format_exc()
         }

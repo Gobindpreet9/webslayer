@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str = "redis://redis:6379/0"
     OLLAMA_HOST: str = 'ollama'
     OLLAMA_PORT: int = 11434
+    IGNORE_ROBOTS: bool = False
     
     @property
     def database_url(self) -> str:

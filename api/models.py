@@ -8,8 +8,8 @@ class FieldTypePydantic(str, Enum):
     float = "float"
     boolean = "boolean"
     list = "list"
-    dict = "dict"
     date = "date"
+    schema = "schema"
 
 class ModelType(str, Enum):
     ollama = "Ollama"
@@ -27,6 +27,23 @@ class SchemaDefinition(BaseModel):
     name: str
     fields: List[SchemaField]
 
+    def to_dict(self) -> dict:
+        """Convert SchemaDefinition to a dictionary format"""
+        return {
+            "name": self.name,
+            "fields": [
+                {
+                    "name": field.name,
+                    "field_type": field.field_type,
+                    "description": field.description,
+                    "required": field.required,
+                    "list_item_type": field.list_item_type,
+                    "default_value": field.default_value
+                }
+                for field in self.fields
+            ]
+        }
+
 class CrawlConfig(BaseModel):
     enable_crawling: bool = Field(default=False)
     max_depth: int = Field(default=2, ge=1, le=10)
@@ -42,6 +59,10 @@ class ScraperConfig(BaseModel):
 class JobRequest(BaseModel):
     urls: List[str]
     schema_name: str
+    return_schema_list: bool = Field(
+        default=False,
+        description="If True, returns list of type Schema, else a single Schema"
+    )
     model_type: ModelType = Field(
         default=ModelType.ollama,
         description="Type of model to use for processing (Ollama or Claude)"
@@ -52,3 +73,4 @@ class JobRequest(BaseModel):
     )
     crawl_config: Optional[CrawlConfig] = CrawlConfig()
     scraper_config: Optional[ScraperConfig] = ScraperConfig()
+    
