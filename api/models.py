@@ -63,7 +63,7 @@ class JobRequest(BaseModel):
         default=False,
         description="If True, returns list of type Schema, else a single Schema"
     )
-    model_type: ModelType = Field(
+    llm_model_type: ModelType = Field(
         default=ModelType.ollama,
         description="Type of model to use for processing (Ollama or Claude)"
     )
