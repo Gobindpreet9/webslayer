@@ -67,7 +67,8 @@ class DataFetcher:
                     data = await self.get_single_page_data(url)
                     if data:
                         content.append(data)
-
+            self.logger.info(f"Fetched {len(content)} pages.")
+            self.logger.debug(f"Content: {content}")
             return content
         finally:
             await self.cleanup()

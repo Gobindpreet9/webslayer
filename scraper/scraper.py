@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+import json
 import logging
 from typing import List
 
@@ -114,9 +116,17 @@ class Scraper:
                 str: The extracted generation text.
             """
         self.state["documents"] = await self.fetch_data()
+        if not self.state.get("documents"):
+            raise HTTPException(status_code=400, detail="Unable to fetch data from provided URLs")
+        
         extraction_team = self.init_extraction_team()
         graph = extraction_team.compile()
         extracted_data = graph.invoke(self.state)
+
+        if not extracted_data or not extracted_data.get("generation"):
+            raise HTTPException(status_code=400, detail="Unable to extract relevant information")
+        
+        self.state["logger"].info(f"Result: {json.dumps(extracted_data['generation'])}")
         return extracted_data['generation']
 
     def init_extraction_team(self) -> StateGraph:

@@ -52,6 +52,7 @@ async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db))
         # Start Celery task
         task = scrape_urls.delay(
             schema=schema_dict,
+            schema_name=job_request.schema_name,
             urls=job_request.urls,
             model_type=job_request.llm_model_type,
             local_model_name=job_request.local_model_name,
@@ -64,6 +65,8 @@ async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db))
             "status": "accepted",
             "message": "Job queued for processing"
         }
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=500,

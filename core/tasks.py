@@ -1,5 +1,7 @@
 import logging
+import traceback
 from celery import Task
+from fastapi import HTTPException
 from core.celery_app import celery_app
 from scraper.scraper import Scraper
 from core.utils import Utils
@@ -26,7 +28,7 @@ class ScraperTask(Task):
         super().on_success(retval, task_id, args, kwargs)
 
 @celery_app.task(bind=True, base=ScraperTask)
-def scrape_urls(self, schema, urls, model_type, local_model_name, crawl_config, scraper_config):
+def scrape_urls(self, schema, schema_name, urls, model_type, local_model_name, crawl_config, scraper_config):
     try:
         logger.info(f"Starting scraping task with config: model_type={model_type}, urls={urls}")
         loop = asyncio.get_event_loop()
@@ -44,11 +46,18 @@ def scrape_urls(self, schema, urls, model_type, local_model_name, crawl_config, 
         logger.debug(f"Scraping result: {report}")
         return {
             'status': 'completed',
-            'result': report
+            'result': report[schema_name]
         }
-    except Exception as e:
+    except HTTPException as e:
         return {
             'status': 'failed',
-            'error': str(e),
-            'error_type': type(e).__name__,
+            'error': str(e.detail),
+            'status_code': e.status_code
+        }
+    except Exception as e:
+        logger.error(f"Unexpected error: {traceback.format_exc()}")
+        return {
+            'status': 'failed',
+            'error': "An unexpected error occurred while processing your request. Please try again or contact support if the issue persists.",
+            'status_code': 500
         }

@@ -5,7 +5,13 @@ import requests
 from api.examples.schema_examples import SCHEMA_EXAMPLES
 
 class TestSchemaRoutes(unittest.TestCase):
-
+    """
+    Test the schema routes.
+    Containers should be running before running these tests.
+    Use the following command to start the containers(in the root directory):
+    docker compose up -d
+    """
+    
     def setUp(self):
         """Set up test case with example schemas"""
         self.base_url = "http://localhost:8000/webslayer/schema"
