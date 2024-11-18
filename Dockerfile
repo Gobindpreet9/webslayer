@@ -25,7 +25,7 @@ COPY . .
 
 RUN chown -R appuser:appuser /app
 
-EXPOSE 8000
+EXPOSE 8000 5678
 
-# Command to run the application
-CMD ["python", "main.py"]
+# Command to run the application with debugpy
+CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "main.py"]

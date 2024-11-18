@@ -8,8 +8,6 @@ services:
       - "5050:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - app-network
     depends_on:
       postgres:
         condition: service_healthy
