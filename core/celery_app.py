@@ -7,7 +7,7 @@ celery_app = Celery(
     "webslayer",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
-    include=['core.tasks']
+    include=['core.scraper_task']
 )
 
 celery_app.conf.update(

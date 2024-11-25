@@ -27,6 +27,14 @@ CREATE TABLE schema_fields (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
+CREATE TABLE reports (
+    name VARCHAR(255) PRIMARY KEY,
+    schema_name VARCHAR(255) REFERENCES schema_definitions(name),
+    content JSONB NOT NULL,
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 CREATE INDEX idx_schema_fields_schema_definition_name ON schema_fields(schema_definition_name);
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()

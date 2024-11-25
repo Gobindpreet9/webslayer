@@ -8,7 +8,7 @@ from api.examples.schema_examples import SCHEMA_EXAMPLES
 
 router = APIRouter(
     prefix="/schema",
-    tags=["Schema"],
+    tags=["Schemas"],
     responses={404: {"description": "Not found"}}
 )
 

@@ -6,6 +6,10 @@ from core.celery_app import celery_app
 from scraper.scraper import Scraper
 from core.utils import Utils
 import asyncio
+from datetime import datetime, timezone
+from core.database.postgres_database import get_db
+from core.adapters.postgres_adapter import PostgresAdapter
+from api.models import Report
 
 logger = logging.getLogger(__name__)
 Utils.setup_logging(logger, True)
@@ -41,12 +45,14 @@ def scrape_urls(self, schema, schema_name, urls, model_type, local_model_name, c
             crawl_config=crawl_config,
             scraper_config=scraper_config
         ))
-        report = loop.run_until_complete(scraper.extract())
+        result = loop.run_until_complete(scraper.extract())
         logger.info(f"Scraping completed successfully")
-        logger.debug(f"Scraping result: {report}")
+        logger.debug(f"Scraping result: {result}")
+
         return {
             'status': 'completed',
-            'result': report[schema_name]
+            'result': result,
+            'schema_name': schema_name
         }
     except HTTPException as e:
         return {

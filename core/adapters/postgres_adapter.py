@@ -2,11 +2,11 @@ from typing import List
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-
-from api.models import SchemaDefinition as SchemaDefinitionPydantic
+from api.models import SchemaDefinition as SchemaDefinitionPydantic, Report as ReportPydantic, ReportFilter
 from core.adapters.data_adapter_interface import DataAdapterInterface
 from core.models.schema import SchemaDefinition, SchemaField
 from sqlalchemy.orm import selectinload
+from core.models.report import Report
 
 class PostgresAdapter(DataAdapterInterface):
     async def get_all_schemas(self, db: AsyncSession) -> List[SchemaDefinitionPydantic]:
@@ -70,4 +70,23 @@ class PostgresAdapter(DataAdapterInterface):
             raise HTTPException(
                 status_code=500,
                 detail=f"Database error: {str(e)}"
+            )
+
+    async def create_report(self, db: AsyncSession, report: ReportPydantic) -> ReportPydantic:
+        try:
+            db_report = Report(
+                name=report.name,
+                schema_name=report.schema_name,
+                content=report.content,
+                timestamp=report.timestamp
+            )
+            db.add(db_report)
+            await db.commit()
+            await db.refresh(db_report)
+            return db_report
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to create report: {str(e)}"
             )
