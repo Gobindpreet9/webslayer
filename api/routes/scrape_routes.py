@@ -1,13 +1,15 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from api.models.report import Report
 from core.database.postgres_database import get_db
 from core.adapters.postgres_adapter import PostgresAdapter
-from core.tasks import scrape_urls
+from core.scraper_task import scrape_urls
 from api.models import JobRequest
+from datetime import datetime, timezone
 
 router = APIRouter(
     prefix="/scrape",
-    tags=["Web Scraping"],
+    tags=["Scrape"],
     responses={404: {"description": "Not found"}}
 )
 
@@ -74,26 +76,54 @@ async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db))
         )
 
 @router.get("/{job_id}")
-async def get_job_status(job_id: str):
+async def get_job_status(job_id: str, db: AsyncSession = Depends(get_db)):
     """Get the status and result of a job"""
     task = scrape_urls.AsyncResult(job_id)
     
     if task.state == 'PENDING':
         response = {
-            'status': 'pending',
-            'job_id': job_id
+            'status': 'pending'
         }
-    elif task.state == 'FAILURE':
+    elif task.state == 'FAILURE' or task.info.get('status') == 'failed':
         response = {
             'status': 'failed',
-            'job_id': job_id,
             'error': str(task.info)
         }
+    elif task.state == 'SUCCESS' and task.info.get('status') == 'completed':
+        try:
+            # Create report name using timestamp
+            report_name = f"{task.info.get('schema_name')}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+            
+            # Create report object
+            report = Report(
+                name=report_name,
+                schema_name=task.info.get('schema_name'),
+                content=task.info.get('result'),
+                timestamp=datetime.now(timezone.utc)
+            )
+
+            # Save report
+            adapter = PostgresAdapter()
+            print(f"Report object: {report}")
+            await adapter.create_report(db, report)
+
+            response = {
+                'status': 'success',
+                'job_id': job_id,
+                'report_name': report_name
+            }
+        except Exception as e:
+            response = {
+                'status': 'failed',
+                'job_id': job_id,
+                'error': f"Failed to create report: {str(e)}"
+            }
     else:
         response = {
             'status': task.state.lower(),
-            'job_id': job_id,
-            'result': task.info
-        }
+                'job_id': job_id,
+                'result': task.info,
+                'error': "Unexpected task state. Please contact support."
+            }
     
     return response 
