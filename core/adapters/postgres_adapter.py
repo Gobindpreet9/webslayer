@@ -90,3 +90,71 @@ class PostgresAdapter(DataAdapterInterface):
                 status_code=500,
                 detail=f"Failed to create report: {str(e)}"
             )
+
+    async def get_report_by_name(self, db: AsyncSession, name: str) -> ReportPydantic:
+        try:
+            result = await db.execute(
+                select(Report).where(Report.name == name)
+            )
+            report = result.scalar_one_or_none()
+            if not report:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Report '{name}' not found"
+                )
+            return report.to_pydantic()
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to retrieve report: {str(e)}"
+            )
+
+    async def get_reports(self, db: AsyncSession, filters: ReportFilter) -> List[ReportPydantic]:
+        try:
+            query = select(
+                Report.name,
+                Report.schema_name,
+                Report.timestamp,
+                Report.created_at
+            )
+            if filters.schema_name:
+                query = query.where(Report.schema_name == filters.schema_name)
+            if filters.start_time:
+                query = query.where(Report.timestamp >= filters.start_time)
+            if filters.end_time:
+                query = query.where(Report.timestamp <= filters.end_time)
+            
+            query = query.order_by(Report.timestamp.desc())
+            query = query.limit(filters.limit)
+            
+            result = await db.execute(query)
+            reports = result.all()
+            return [
+                ReportPydantic(
+                    name=report.name,
+                    schema_name=report.schema_name,
+                    timestamp=report.timestamp
+                ) 
+                for report in reports
+            ]
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to retrieve reports: {str(e)}"
+            )
+
+    async def delete_report(self, db: AsyncSession, name: str) -> bool:
+        try:
+            result = await db.execute(
+                delete(Report).where(Report.name == name)
+            )
+            await db.commit()
+            return result.rowcount > 0
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to delete report: {str(e)}"
+            )

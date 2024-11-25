@@ -3,7 +3,7 @@ from fastapi import FastAPI
 import logging
 import uvicorn
 
-from api.routes import schema_router, scraping_router
+from api.routes import schema_router, scraping_router, reports_router
 from core.settings import Settings
 from core.utils import Utils
 from core.database.postgres_database import db
@@ -32,6 +32,7 @@ app = FastAPI(
 # Include routers
 app.include_router(schema_router, prefix="/webslayer")
 app.include_router(scraping_router, prefix="/webslayer")
+app.include_router(reports_router, prefix="/webslayer")
 
 if __name__ == "__main__":
     uvicorn.run(
