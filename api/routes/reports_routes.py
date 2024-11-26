@@ -6,7 +6,7 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.database.postgres_database import get_db
 from core.adapters.postgres_adapter import PostgresAdapter
-from api.models import Report, ReportFilter
+from api.models import Report, ReportFilter, ReportMetadata
 import json
 import tempfile
 from datetime import datetime
@@ -17,7 +17,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-@router.get("/", response_model=List[Report])
+@router.get("/", response_model=List[ReportMetadata])
 async def list_reports(
     schema_name: Optional[str] = Query(None),
     start_time: Optional[datetime] = Query(None),

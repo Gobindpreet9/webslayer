@@ -2,11 +2,13 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
-class Report(BaseModel):
+class ReportMetadata(BaseModel):
     name: str = Field(..., description="Unique name of the report")
     schema_name: str = Field(..., description="Name of the related schema")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    content: Optional[dict] = None
+
+class Report(ReportMetadata):
+    content: dict = Field(..., min_length=1)
 
 class ReportFilter(BaseModel):
     schema_name: Optional[str] = None

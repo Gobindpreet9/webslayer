@@ -3,6 +3,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from api.models import SchemaDefinition as SchemaDefinitionPydantic, Report as ReportPydantic, ReportFilter
+from api.models.report import ReportMetadata
 from core.adapters.data_adapter_interface import DataAdapterInterface
 from core.models.schema import SchemaDefinition, SchemaField
 from sqlalchemy.orm import selectinload
@@ -14,6 +15,9 @@ class PostgresAdapter(DataAdapterInterface):
             result = await db.execute(select(SchemaDefinition.name))
             names = result.scalars().all()
             return names
+        except HTTPException:
+            # Re-raise HTTP exceptions to be handled by FastAPI
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=500,
@@ -33,7 +37,6 @@ class PostgresAdapter(DataAdapterInterface):
                 )
             return schema.to_pydantic()
         except HTTPException:
-            # Re-raise HTTP exceptions to be handled by FastAPI
             raise
         except Exception as e:
             raise HTTPException(
@@ -53,6 +56,8 @@ class PostgresAdapter(DataAdapterInterface):
                 )
                 db_schema = await db.merge(db_schema)
                 return db_schema.to_pydantic()
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=500,
@@ -65,6 +70,8 @@ class PostgresAdapter(DataAdapterInterface):
             result = await db.execute(delete(SchemaDefinition).where(SchemaDefinition.name == name))
             await db.commit()
             return result.rowcount > 0
+        except HTTPException:
+            raise
         except Exception as e:
             await db.rollback()
             raise HTTPException(
@@ -74,6 +81,15 @@ class PostgresAdapter(DataAdapterInterface):
 
     async def create_report(self, db: AsyncSession, report: ReportPydantic) -> ReportPydantic:
         try:
+            schema_exists = await db.execute(
+                select(SchemaDefinition).where(SchemaDefinition.name == report.schema_name)
+            )
+            if not schema_exists.scalar_one_or_none():
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Schema '{report.schema_name}' not found"
+                )
+
             db_report = Report(
                 name=report.name,
                 schema_name=report.schema_name,
@@ -84,6 +100,8 @@ class PostgresAdapter(DataAdapterInterface):
             await db.commit()
             await db.refresh(db_report)
             return db_report
+        except HTTPException:
+            raise
         except Exception as e:
             await db.rollback()
             raise HTTPException(
@@ -111,7 +129,7 @@ class PostgresAdapter(DataAdapterInterface):
                 detail=f"Failed to retrieve report: {str(e)}"
             )
 
-    async def get_reports(self, db: AsyncSession, filters: ReportFilter) -> List[ReportPydantic]:
+    async def get_reports(self, db: AsyncSession, filters: ReportFilter) -> List[ReportMetadata]:
         try:
             query = select(
                 Report.name,
@@ -132,13 +150,15 @@ class PostgresAdapter(DataAdapterInterface):
             result = await db.execute(query)
             reports = result.all()
             return [
-                ReportPydantic(
+                ReportMetadata(
                     name=report.name,
                     schema_name=report.schema_name,
                     timestamp=report.timestamp
                 ) 
                 for report in reports
             ]
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=500,
@@ -152,6 +172,8 @@ class PostgresAdapter(DataAdapterInterface):
             )
             await db.commit()
             return result.rowcount > 0
+        except HTTPException:
+            raise
         except Exception as e:
             await db.rollback()
             raise HTTPException(

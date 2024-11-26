@@ -3,7 +3,7 @@ from .fields import SchemaField
 from .schema import SchemaDefinition
 from .config import CrawlConfig, ScraperConfig
 from .job import JobRequest
-from .report import Report, ReportFilter
+from .report import Report, ReportFilter, ReportMetadata
 
 __all__ = [
     'FieldTypePydantic',
@@ -14,5 +14,6 @@ __all__ = [
     'ScraperConfig',
     'JobRequest',
     'Report',
-    'ReportFilter'
+    'ReportFilter',
+    'ReportMetadata'
 ] 
