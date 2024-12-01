@@ -182,5 +182,22 @@ class TestReportsRoutes(TestCase):
         # Clean up
         requests.delete(f"{self.reports_url}/{report_with_timestamp['name']}")
 
+    def test_delete_schema_with_reports_200(self):
+        """Test deleting a schema with reports"""
+        # Create report
+        response = requests.post(f"{self.reports_url}/", json=self.test_report)
+        self.assertEqual(response.status_code, 200)
+
+        # Delete schema
+        delete_response = requests.delete(f"{self.schema_url}/{self.philosophers_schema['name']}")
+        self.assertEqual(delete_response.status_code, 200)
+
+        # Verify report is still there
+        get_response = requests.get(f"{self.reports_url}/{self.test_report['name']}")
+        self.assertEqual(get_response.status_code, 200)
+
+        # Clean up
+        requests.delete(f"{self.reports_url}/{self.test_report['name']}")
+
 if __name__ == "__main__":
     unittest.main() 
