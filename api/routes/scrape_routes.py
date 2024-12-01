@@ -98,8 +98,7 @@ async def get_job_status(job_id: str, db: AsyncSession = Depends(get_db)):
             report = Report(
                 name=report_name,
                 schema_name=task.info.get('schema_name'),
-                content=task.info.get('result'),
-                timestamp=datetime.now(timezone.utc)
+                content=task.info.get('result')
             )
 
             # Save report

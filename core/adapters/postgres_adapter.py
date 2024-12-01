@@ -94,7 +94,6 @@ class PostgresAdapter(DataAdapterInterface):
                 name=report.name,
                 schema_name=report.schema_name,
                 content=report.content,
-                timestamp=report.timestamp
             )
             db.add(db_report)
             await db.commit()

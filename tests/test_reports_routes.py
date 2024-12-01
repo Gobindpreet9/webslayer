@@ -1,7 +1,7 @@
 from unittest import TestCase
 import unittest
 import requests
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from copy import deepcopy
 
 from api.examples.schema_examples import SCHEMA_EXAMPLES
@@ -37,8 +37,7 @@ class TestReportsRoutes(TestCase):
                         "area_of_expertise": "Ethics and the Socratic method"
                     }
                 ]
-            },
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            }
         }
 
     def tearDown(self):
@@ -145,6 +144,43 @@ class TestReportsRoutes(TestCase):
         self.assertEqual(len(content['philosophers_schema']), 1)
         philosopher = content['philosophers_schema'][0]
         self.assertEqual(philosopher['name'], 'Socrates')
+
+    def test_create_report_with_timestamp_200(self):
+        """Test that timestamp is auto-generated regardless of provided value"""
+        # Create report with future timestamp
+        future_timestamp = datetime(2100, 1, 1, tzinfo=timezone.utc).isoformat()
+        report_with_timestamp = {
+            "name": "report_with_timestamp",
+            "schema_name": self.philosophers_schema["name"],
+            "content": {
+                "philosophers_schema": [
+                    {
+                        "name": "Plato",
+                        "description": "Classical Greek philosopher",
+                        "area_of_expertise": "Metaphysics"
+                    }
+                ]
+            },
+            "timestamp": future_timestamp
+        }
+        
+        response = requests.post(f"{self.reports_url}/", json=report_with_timestamp)
+        self.assertEqual(response.status_code, 200)
+
+        # Get report to verify timestamp
+        get_response = requests.get(f"{self.reports_url}/{report_with_timestamp['name']}")
+        self.assertEqual(get_response.status_code, 200)
+        
+        report = get_response.json()
+        report_timestamp = datetime.fromisoformat(report["timestamp"])
+        
+        # Verify timestamp is recent (within last minute) and not our future date
+        now = datetime.now(timezone.utc)
+        self.assertLess(now - report_timestamp, timedelta(minutes=1))
+        self.assertNotEqual(report_timestamp.isoformat(), future_timestamp)
+
+        # Clean up
+        requests.delete(f"{self.reports_url}/{report_with_timestamp['name']}")
 
 if __name__ == "__main__":
     unittest.main() 
