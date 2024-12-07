@@ -139,9 +139,9 @@ class Scraper:
             model_type=self.model_type,
             local_model_name=self.local_model_name,
             schema=self.state["schema"], 
-            enable_chunking=self.scraper_config.get('enable_chunking', True), 
-            chunk_size=self.scraper_config.get('chunk_size', 6000), 
-            chunk_overlap_size=self.scraper_config.get('chunk_overlap', 150)
+            enable_chunking=self.crawl_config.get('enable_chunking', True), 
+            chunk_size=self.crawl_config.get('chunk_size', 6000), 
+            chunk_overlap_size=self.crawl_config.get('chunk_overlap', 150)
         )
         response_cleaner_agent = ResponseCleanerAgent(
             model_type=self.model_type,
