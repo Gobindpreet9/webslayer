@@ -10,4 +10,6 @@ class CrawlConfig(BaseModel):
 
 class ScraperConfig(BaseModel):
     max_hallucination_checks: int = Field(default=2, ge=0, le=5)
-    max_quality_checks: int = Field(default=2, ge=0, le=5) 
+    max_quality_checks: int = Field(default=2, ge=0, le=5)
+    enable_hallucination_check: bool = Field(default=True, description="Whether to enable hallucination checking")
+    enable_quality_check: bool = Field(default=True, description="Whether to enable quality checking") 

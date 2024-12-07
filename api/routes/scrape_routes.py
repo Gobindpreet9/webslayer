@@ -42,7 +42,21 @@ async def get_schema_dict(db: AsyncSession, schema_name: str, return_as_list: bo
         ]
     }
 
-@router.post("/start")
+@router.post("/start", 
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "urls": ["https://example.com"],
+                        "schema_name": "schema_name",
+                        "return_schema_list": True
+                    }
+                }
+            }
+        }
+    }
+)
 async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db)):
     """Start a new scraping job"""
     try:

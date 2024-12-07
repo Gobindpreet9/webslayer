@@ -131,10 +131,11 @@ class Scraper:
 
     def init_extraction_team(self) -> StateGraph:
         """
-        Initializes the extraction team.
-        :return: The initialized extraction team.
+        Initializes the extraction team workflow.
+
+        Returns:
+            StateGraph: The workflow graph.
         """
-        # Initialize agents
         data_extractor_agent = DataExtractorAgent(
             model_type=self.model_type,
             local_model_name=self.local_model_name,
@@ -150,11 +151,13 @@ class Scraper:
         hallucination_grader_agent = HallucinationGraderAgent(
             model_type=self.model_type,
             local_model_name=self.local_model_name,
-            max_hallucination_checks=self.scraper_config.get('max_hallucination_checks', 2))
+            max_hallucination_checks=self.scraper_config.max_hallucination_checks
+        )
         quality_assurance_agent = QualityAssuranceAgent(
             model_type=self.model_type,
             local_model_name=self.local_model_name,
-            max_quality_checks=self.scraper_config.get('max_quality_checks', 2))
+            max_quality_checks=self.scraper_config.max_quality_checks
+        )
 
         workflow = StateGraph(GraphState)
 
@@ -167,21 +170,28 @@ class Scraper:
         # Add edges
         workflow.set_entry_point("extract_data")
         workflow.add_edge("extract_data", "clean_response")
-        workflow.add_edge("clean_response", "grade_hallucinations")
-        workflow.add_conditional_edges(
-            "grade_hallucinations",
-            decide_to_regenerate,
-            {
-                "regenerate": "extract_data",
-                "quality_assurance": "quality_assurance"
-            })
-        workflow.add_conditional_edges(
-            "quality_assurance",
-            grade_generation,
-            {
-                "useful": END,
-                "not useful": "extract_data"
-            })
+
+        if self.scraper_config.enable_hallucination_check:
+            workflow.add_edge("clean_response", "grade_hallucinations")
+            workflow.add_conditional_edges(
+                "grade_hallucinations",
+                decide_to_regenerate,
+                {
+                    "regenerate": "extract_data",
+                    "quality_assurance": "quality_assurance" if self.scraper_config.enable_quality_check else END
+                })
+        else:
+            workflow.add_edge("clean_response", "quality_assurance" if self.scraper_config.enable_quality_check else END)
+
+        if self.scraper_config.enable_quality_check:
+            workflow.add_conditional_edges(
+                "quality_assurance",
+                grade_generation,
+                {
+                    "useful": END,
+                    "not useful": "extract_data"
+                })
+
         return workflow
 
 
