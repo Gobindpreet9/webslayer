@@ -165,7 +165,7 @@ class TestScrapingRoutes(TestCase):
             "schema_name": self.events_schema["name"],
             "return_schema_list": True,
             "llm_model_type": ModelType.ollama.value,
-            "local_model_name": "llama3.1:8b-instruct-q5_0",
+            "llm_model_name": "llama3.1:8b-instruct-q5_0",
             "crawl_config": {
                 "enable_crawling": False,
                 "max_depth": 2,

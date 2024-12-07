@@ -11,4 +11,6 @@ class FieldTypePydantic(str, Enum):
 
 class ModelType(str, Enum):
     ollama = "Ollama"
-    claude = "Claude" 
+    claude = "Claude"
+    openai = "OpenAI"
+ 

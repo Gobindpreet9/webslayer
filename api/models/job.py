@@ -12,11 +12,11 @@ class JobRequest(BaseModel):
     )
     llm_model_type: ModelType = Field(
         default=ModelType.ollama,
-        description="Type of model to use for processing (Ollama or Claude)"
+        description="Type of model to use for processing (Ollama, Claude, or OpenAI)"
     )
-    local_model_name: str = Field(
+    llm_model_name: str = Field(
         default="llama3.1:8b-instruct-q5_0",
-        description="Name of the LLM model to use for processing. For Ollama only."
+        description="Name of the LLM model to use for processing."
     )
     crawl_config: Optional[CrawlConfig] = CrawlConfig()
     scraper_config: Optional[ScraperConfig] = ScraperConfig() 

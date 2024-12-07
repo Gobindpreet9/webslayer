@@ -57,7 +57,7 @@ async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db))
             schema_name=job_request.schema_name,
             urls=job_request.urls,
             model_type=job_request.llm_model_type,
-            local_model_name=job_request.local_model_name,
+            model_name=job_request.llm_model_name,
             crawl_config=crawl_config,
             scraper_config=scraper_config
         )

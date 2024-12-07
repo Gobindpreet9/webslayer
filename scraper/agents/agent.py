@@ -6,6 +6,7 @@ from langchain_ollama import OllamaLLM
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from core.settings import Settings
+from langchain_openai import ChatOpenAI
 
 settings = Settings()
 
@@ -56,17 +57,29 @@ class Agent(ABC):
 
     def configure_default_llm(self):
         """
-            Method configures the LLM instance. The default LLM is llama3.
+        Method configures the LLM instance based on the selected model type.
         """
-        if self.model_type == ModelType.claude:
-            self.llm = ChatAnthropic(
-                    model="claude-3-5-sonnet-20240620",
+        if self.model_type == ModelType.claude or self.model_type == ModelType.openai:
+            if not settings.API_KEY:
+                raise ValueError(f"{self.model_type} API key is required in settings")
+            
+            if self.model_type == ModelType.claude:
+                self.llm = ChatAnthropic(
+                    api_key=settings.API_KEY,
+                    model=self.local_model_name,
                     temperature=0,
-                    max_tokens=1024,
                     timeout=None,
                     max_retries=2
                 )
-        else:
+            else:  # OpenAI
+                self.llm = ChatOpenAI(
+                    api_key=settings.API_KEY,
+                    model=self.local_model_name,
+                    temperature=0,
+                    timeout=None,
+                    max_retries=2
+                )
+        else:  # Default to Ollama
             self.llm = OllamaLLM(
                 base_url=f"http://{settings.OLLAMA_HOST}:{settings.OLLAMA_PORT}",
                 model=self.local_model_name,

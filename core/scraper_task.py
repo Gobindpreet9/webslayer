@@ -6,10 +6,6 @@ from core.celery_app import celery_app
 from scraper.scraper import Scraper
 from core.utils import Utils
 import asyncio
-from datetime import datetime, timezone
-from core.database.postgres_database import get_db
-from core.adapters.postgres_adapter import PostgresAdapter
-from api.models import Report
 
 logger = logging.getLogger(__name__)
 Utils.setup_logging(logger, True)
@@ -32,7 +28,7 @@ class ScraperTask(Task):
         super().on_success(retval, task_id, args, kwargs)
 
 @celery_app.task(bind=True, base=ScraperTask)
-def scrape_urls(self, schema, schema_name, urls, model_type, local_model_name, crawl_config, scraper_config):
+def scrape_urls(self, schema, schema_name, urls, model_type, model_name, crawl_config, scraper_config):
     try:
         logger.info(f"Starting scraping task with config: model_type={model_type}, urls={urls}")
         loop = asyncio.get_event_loop()
@@ -40,7 +36,7 @@ def scrape_urls(self, schema, schema_name, urls, model_type, local_model_name, c
             schema=schema,
             urls_to_search=urls,
             model_type=model_type,
-            local_model_name=local_model_name,
+            local_model_name=model_name,
             logger=logger,
             crawl_config=crawl_config,
             scraper_config=scraper_config
