@@ -1,6 +1,8 @@
 services:
   webslayer:
     build: .
+    environment:
+      - DEFAULT_LLM_MODEL=${DEFAULT_LLM_MODEL:-llama3.1:8b-instruct-q5_0}
     ports:
       - "8000:8000"
       - "5678:5678"
@@ -34,6 +36,8 @@ services:
 
   ollama-init:
     image: curlimages/curl:latest
+    environment:
+      - DEFAULT_LLM_MODEL=${DEFAULT_LLM_MODEL:-llama3.1:8b-instruct-q5_0}
     depends_on:
       ollama:
         condition: service_started
