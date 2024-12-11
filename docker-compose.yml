@@ -9,41 +9,25 @@ services:
     volumes:
       - webslayer_data:/webslayer
     depends_on:
-      ollama:
-        condition: service_started
-      ollama-init:
-        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
         condition: service_started
 
-  # https://hub.docker.com/r/ollama/ollama instructions how to enable GPU
-  ollama:
-    image: ollama/ollama:latest
+  celery_worker:
+    build: .
+    command: >
+      python -m debugpy --listen 0.0.0.0:5679
+      -m celery -A core.celery_app worker --loglevel=info
     ports:
-      - "11434:11434"
+      - "5679:5679"
     volumes:
-      - ollama_data:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    command: serve
-
-  ollama-init:
-    image: curlimages/curl:latest
-    environment:
-      - DEFAULT_LLM_MODEL=${DEFAULT_LLM_MODEL:-llama3.1:8b-instruct-q5_0}
+      - webslayer_data:/webslayer
     depends_on:
-      ollama:
+      postgres:
+        condition: service_healthy
+      redis:
         condition: service_started
-    volumes:
-      - ./ollama-init.sh:/ollama-init.sh
-    command: sh /ollama-init.sh
 
   postgres:
     image: postgres:latest
@@ -67,24 +51,6 @@ services:
     ports:
       - "6379:6379"
 
-  celery_worker:
-    build: .
-    command: >
-      python -m debugpy --listen 0.0.0.0:5679
-      -m celery -A core.celery_app worker --loglevel=info
-    ports:
-      - "5679:5679"
-    volumes:
-      - webslayer_data:/webslayer
-    depends_on:
-      redis:
-        condition: service_started
-      ollama:
-        condition: service_started
-      postgres:
-        condition: service_healthy
-
 volumes:
-  ollama_data:
   webslayer_data:
   postgres_data:
