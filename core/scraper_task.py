@@ -2,6 +2,7 @@ import logging
 import traceback
 from celery import Task
 from fastapi import HTTPException
+from httpx import ConnectError
 from core.celery_app import celery_app
 from scraper.scraper import Scraper
 from core.utils import Utils
@@ -55,6 +56,13 @@ def scrape_urls(self, schema, schema_name, urls, model_type, model_name, crawl_c
             'status': 'failed',
             'error': str(e.detail),
             'status_code': e.status_code
+        }
+    except ConnectError as e:
+        logger.error(f"Connection error: {e}")
+        return {
+            'status': 'failed',
+            'error': "Please make sure the selected service and model are available.",
+            'status_code': 504
         }
     except Exception as e:
         logger.error(f"Unexpected error: {traceback.format_exc()}")

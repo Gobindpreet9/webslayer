@@ -151,39 +151,44 @@ class Scraper:
         hallucination_grader_agent = HallucinationGraderAgent(
             model_type=self.model_type,
             local_model_name=self.local_model_name,
-            max_hallucination_checks=self.scraper_config.max_hallucination_checks
+            max_hallucination_checks=self.scraper_config.get('max_hallucination_checks', 0)
         )
         quality_assurance_agent = QualityAssuranceAgent(
             model_type=self.model_type,
             local_model_name=self.local_model_name,
-            max_quality_checks=self.scraper_config.max_quality_checks
+            max_quality_checks=self.scraper_config.get('max_quality_checks', 0)
         )
+
+        enable_hallucination_check = self.scraper_config.get('enable_hallucination_check', False)
+        enable_quality_check = self.scraper_config.get('enable_quality_check', False)
 
         workflow = StateGraph(GraphState)
 
         # Add nodes for each agent
         workflow.add_node("extract_data", data_extractor_agent.act)
         workflow.add_node("clean_response", response_cleaner_agent.act)
-        workflow.add_node("grade_hallucinations", hallucination_grader_agent.act)
-        workflow.add_node("quality_assurance", quality_assurance_agent.act)
+        if enable_hallucination_check:
+            workflow.add_node("grade_hallucinations", hallucination_grader_agent.act)
+        if enable_quality_check:
+            workflow.add_node("quality_assurance", quality_assurance_agent.act)
 
         # Add edges
         workflow.set_entry_point("extract_data")
         workflow.add_edge("extract_data", "clean_response")
 
-        if self.scraper_config.enable_hallucination_check:
+        if enable_hallucination_check:
             workflow.add_edge("clean_response", "grade_hallucinations")
             workflow.add_conditional_edges(
                 "grade_hallucinations",
                 decide_to_regenerate,
                 {
                     "regenerate": "extract_data",
-                    "quality_assurance": "quality_assurance" if self.scraper_config.enable_quality_check else END
+                    "quality_assurance": "quality_assurance" if enable_quality_check else END
                 })
         else:
-            workflow.add_edge("clean_response", "quality_assurance" if self.scraper_config.enable_quality_check else END)
+            workflow.add_edge("clean_response", "quality_assurance" if enable_quality_check else END)
 
-        if self.scraper_config.enable_quality_check:
+        if enable_quality_check:
             workflow.add_conditional_edges(
                 "quality_assurance",
                 grade_generation,

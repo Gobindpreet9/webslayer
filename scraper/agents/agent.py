@@ -79,7 +79,7 @@ class Agent(ABC):
                     timeout=None,
                     max_retries=2
                 )
-        else:  # Default to Ollama
+        elif self.model_type == ModelType.ollama:
             self.llm = OllamaLLM(
                 base_url=f"http://{settings.OLLAMA_HOST}:{settings.OLLAMA_PORT}",
                 model=self.local_model_name,
@@ -87,6 +87,8 @@ class Agent(ABC):
                 temperature=0.4,
                 format='json'
             )
+        else:
+            raise ValueError(f"Unsupported model type: {self.model_type}")
 
     def configure_default_json_parser(self, schema=None):
         """
