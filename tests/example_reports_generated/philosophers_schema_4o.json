@@ -1,0 +1,209 @@
+{
+  "philosophers_schema": [
+    {
+      "name": "Laozi",
+      "description": "Known as the author of Daodejing (also known as 'The Classic of the Way and of Virtue'). His idea in Chinese is called Wu Wei (means 'inaction'). By 'inaction' however it doesn't necessarily mean not doing any actions, but to do in bare minimum needed until the rest is done spontaneously.",
+      "area_of_expertise": "Taoism"
+    },
+    {
+      "name": "Confucius",
+      "description": "Known as the most impactful teacher in the whole history of China. He is the author of Analects, which not only includes his teachings, but also how to teach. Ren and Zhi are two fundamental virtues of Confucianism. Ren means 'humanity' and 'goodness' to help each other, and Zhi means 'Wisdom' (the ability to distinguish between right and wrong).",
+      "area_of_expertise": "Confucianism"
+    },
+    {
+      "name": "Siddhartha Gautama (Buddha)",
+      "description": "Buddha means 'Awakened One', or 'Enlightened One'. His teaching was to overcome Dukkha ('pain' or 'dissatisfaction') with everyday life. He introduced intellectual systems and practical practices called Sila and Samadhi.",
+      "area_of_expertise": "Buddhism"
+    },
+    {
+      "name": "Diotima of Mantinea",
+      "description": "She was inspiring to Socrates, and gave the basics of the 'Platonic love' concept (love without sexual desires) to Plato. Based on Diotima's Ladder of Love, there are six types of love, and each kind is put on a rung of a ladder.",
+      "area_of_expertise": "Platonic love"
+    },
+    {
+      "name": "Socrates",
+      "description": "Socrates is described as 'The Gadfly of Athens' by Plato. He tried to understand the basic human concerns like ethics, justice, and virtue. He has many notable ideas like 'I know that I know nothing' known as the Socratic paradox.",
+      "area_of_expertise": "Ethics, justice, and virtue"
+    },
+    {
+      "name": "Diogenes of Sinope",
+      "description": "Diogenes is famous for challenging traditions in a violent and insulting way, and the austerity and simplicity of his life based on his Cynic philosophy. He maintained that all the artificial growths of society were incompatible with happiness.",
+      "area_of_expertise": "Cynicism"
+    },
+    {
+      "name": "Plato",
+      "description": "Plato is one of the most impactful philosophers in western philosophy. He was against the Athenian democracy and believed in the 'Theory of Forms'. In this theory, all objects and matter in the physical world are merely imitations of 'Ideas' or 'Forms'.",
+      "area_of_expertise": "Theory of Forms, Republic"
+    },
+    {
+      "name": "Aristotle",
+      "description": "Unlike his teacher Plato, Aristotle had a natural approach in philosophy. He believed that knowledge should be obtained via natural experiments. He has many contributions in Theoretical philosophy, Natural philosophy, and Practical philosophy.",
+      "area_of_expertise": "Aristotelian logic, ethics, biology"
+    },
+    {
+      "name": "Mencius",
+      "description": "Mencius, also known as Mengzi, is one of the most notable Confucianist philosophers. He believed that human nature is righteous and humane.",
+      "area_of_expertise": "Confucianism"
+    },
+    {
+      "name": "Master Zhuang",
+      "description": "He had a simple life in nature far from society, which was consistent with his Taoist beliefs. He is the author of Zhuangzi, a Chinese text containing stories and anecdotes that exemplify the carefree nature of the ideal Taoist.",
+      "area_of_expertise": "Taoism"
+    },
+    {
+      "name": "Epicurus",
+      "description": "Epicurus's Liberal Materialism is often misinterpreted as extreme hedonism. He believed the goal of life is to live happily and with pleasure, recommending moderate pleasure and peace of mind, and avoiding the fear of death.",
+      "area_of_expertise": "Hedonism, Materialism"
+    },
+    {
+      "name": "Marcus Aurelius",
+      "description": "A Stoic philosopher who became the Roman emperor. Known as the 'Philosopher King', he authored 'Meditations' describing Stoic philosophy, which teaches that virtue is the only good.",
+      "area_of_expertise": "Stoicism"
+    },
+    {
+      "name": "Nagarjuna",
+      "description": "A significant Buddhist philosopher and founder of the Madhyamaka school. He discerned two levels of truth: conventional truth and ultimate truth, known as emptiness.",
+      "area_of_expertise": "Buddhism, Madhyamaka"
+    },
+    {
+      "name": "Augustine of Hippo",
+      "description": "A theologian and philosopher of Berber origin. He saw humans as a unity of soul and body and warned against astrologers.",
+      "area_of_expertise": "Theology, Philosophy"
+    },
+    {
+      "name": "Hypatia",
+      "description": "A famous astronomer and mathematician, as well as a Neoplatonic philosopher. Known for editing Ptolemy's Almagest.",
+      "area_of_expertise": "Neoplatonism, Astronomy, Mathematics"
+    },
+    {
+      "name": "Boethius",
+      "description": "A philosopher who wrote 'On the Consolation of Philosophy' in prison, discussing the transitory nature of fame and wealth and the superiority of the mind.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Ibn Sina (Avicenna)",
+      "description": "A polymath author of 'The Book of Healing' and 'The Canon of Medicine'. His works cover various fields, and he is known for the 'floating man' thought experiment.",
+      "area_of_expertise": "Philosophy, Medicine, Science"
+    },
+    {
+      "name": "Anselm",
+      "description": "Known as the father of the scholastic tradition, Anselm was the philosopher monk of Canterbury. He believed that faith is more valuable than logic, but he wanted to strengthen faith with logical arguments. In his two writings called Monologion and Proslogion, he introduces two arguments to support the existence of God: cosmological argument and ontological argument.",
+      "area_of_expertise": "Scholasticism, Theology"
+    },
+    {
+      "name": "Hildegard of Bingen",
+      "description": "Known as 'The Sibyl of the Rhine', she was one of the most impactful composer, philosopher, mystic, visionary, and a medical writer of the Middle Ages. She is revered as an early example of a feminist thinker.",
+      "area_of_expertise": "Mysticism, Feminism, Music"
+    },
+    {
+      "name": "H\u00e9lo\u00efse",
+      "description": "Writer, philosopher of love and friendship, and the French nun, H\u00e9lo\u00efse, was one of the pioneers of the feminist thought. She is famous for her love story with Peter Abelard and the exerting critical intellectual influence upon his work.",
+      "area_of_expertise": "Feminism, Philosophy of Love"
+    },
+    {
+      "name": "Ibn Rushd (Averroes)",
+      "description": "He combined Greek and Islamic thoughts. His philosophical works include numerous commentaries on Aristotle, for which he was known in the Western world as The Commentator and Father of Rationalism.",
+      "area_of_expertise": "Aristotelianism, Rationalism"
+    },
+    {
+      "name": "Zhu Xi",
+      "description": "He created an impactful philosophical system known as Neo-Confucianism. The core of Zhu Xi's philosophy is the relation between 'Li' (rational principle) and 'Chi' (vital energy).",
+      "area_of_expertise": "Neo-Confucianism"
+    },
+    {
+      "name": "Moses Maimonides",
+      "description": "Maimonides was the physician, the lawyer, and the philosopher who first adapted Aristotle's teachings to Jewish theology in his masterpiece, 'The Guide For The Perplexed'.",
+      "area_of_expertise": "Jewish Philosophy, Aristotelianism"
+    },
+    {
+      "name": "Albertus Magnus",
+      "description": "Known as the 'Doctor Universalis' because of the vast of his knowledge. He combined Aristotle's thoughts with Christian teachings and wrote about different topics, most notably the systematic study of minerals.",
+      "area_of_expertise": "Natural Philosophy, Theology"
+    },
+    {
+      "name": "Thomas Aquinas",
+      "description": "He was an Italian Dominican friar and priest, known as the most influential thinker of the Middle Ages. He is the author of 'Summa Theologica', in which he expanded Aristotle's thoughts and adopted them to Catholic ideas.",
+      "area_of_expertise": "Theology, Scholasticism"
+    },
+    {
+      "name": "William of Ockham",
+      "description": "He believed that God cannot be known directly, and God will always be incomprehensible to mankind. He did not accept the possibility of knowing the existence of God with mere reason.",
+      "area_of_expertise": "Nominalism, Theology"
+    },
+    {
+      "name": "William of Ockham",
+      "description": "He is known for Ockham's razor, the principle of parsimony, which suggests that the simplest explanation is usually the correct one.",
+      "area_of_expertise": "Philosophy of religion, logic"
+    },
+    {
+      "name": "Desiderius Erasmus",
+      "description": "A Humanist philosopher known for 'In Praise of Folly', a satirical attack on superstitions and religious prejudices.",
+      "area_of_expertise": "Humanism"
+    },
+    {
+      "name": "Niccolo Machiavelli",
+      "description": "Known for 'The Prince', advising rulers to use expedient and opportunistic political ethics.",
+      "area_of_expertise": "Political philosophy"
+    },
+    {
+      "name": "Michel de Montaigne",
+      "description": "Popularized essay-writing as a literary genre and used skeptical questioning in everyday life.",
+      "area_of_expertise": "Renaissance philosophy"
+    },
+    {
+      "name": "Francis Bacon",
+      "description": "Father of empiricism, advocated for scientific approaches based on observation and experience.",
+      "area_of_expertise": "Empiricism, scientific method"
+    },
+    {
+      "name": "Thomas Hobbes",
+      "description": "Known for his political philosophy in 'Leviathan', advocating for authoritarian governments.",
+      "area_of_expertise": "Political philosophy"
+    },
+    {
+      "name": "Ren\u00e9 Descartes",
+      "description": "Father of modern philosophy, known for 'Cogito ergo sum' and founding rationalism.",
+      "area_of_expertise": "Rationalism, modern philosophy"
+    },
+    {
+      "name": "Ren\u00e9 Descartes",
+      "description": "Known for Cartesian Doubt, emphasizing the necessity of doubting all things at least once in life to seek truth.",
+      "area_of_expertise": "Epistemology, Metaphysics"
+    },
+    {
+      "name": "Blaise Pascal",
+      "description": "A mathematician and inventor focused on spiritual quest, known for his religious doctrine and application of game theory in 'Pens\u00e9es'.",
+      "area_of_expertise": "Mathematics, Theology"
+    },
+    {
+      "name": "Baruch Spinoza",
+      "description": "Proposed absolute monism, believing mind and body are transformations of a single substance, God. Advocated for personal interpretation of religious texts.",
+      "area_of_expertise": "Metaphysics, Ethics"
+    },
+    {
+      "name": "John Locke",
+      "description": "Established political liberalism and philosophical empiricism, arguing against innate knowledge and absolute monarchy.",
+      "area_of_expertise": "Political Philosophy, Epistemology"
+    },
+    {
+      "name": "Gottfried Wilhelm Leibniz",
+      "description": "Inventor of calculus, known for 'Theodicy' and 'Monadology', explaining existence through Monas and addressing the problem of evil.",
+      "area_of_expertise": "Mathematics, Metaphysics"
+    },
+    {
+      "name": "Juana In\u00e9s de la Cruz",
+      "description": "A poet and scholar advocating for women's education, faced criticism from church authorities, known as a symbol of feminism.",
+      "area_of_expertise": "Literature, Feminism"
+    },
+    {
+      "name": "George Berkeley",
+      "description": "Proposed Subjective Idealism, arguing material objects exist only in perception, challenging Locke's materialism.",
+      "area_of_expertise": "Epistemology, Metaphysics"
+    },
+    {
+      "name": "Voltaire",
+      "description": "Voltaire was one of the key figures of the rationalism of the Age of Enlightenment and one of the founders of the modern liberal tradition. He was devoted to freedom of speech and thought, and a critic of the authority of religion and government. Influenced by John Locke's liberal philosophy, Isaac Newton's science, and the freedom of speech and religious tolerance of Britain, in his book entitled 'Letters on the English', he praised the opponents of religion, Locke's theory of knowledge based on evidence, and the freedom of science from religious prejudices. This book was banned, denounced and burned because of its anti-Catholic tendencies in Voltaire's place of birth, France. After the torture and execution of a French Protestant who was wrongly accused of murder, he wrote the 'Treatise on Tolerance' and defended Deism.",
+      "area_of_expertise": "Rationalism, freedom of speech, criticism of religion and government, Deism"
+    }
+  ]
+}

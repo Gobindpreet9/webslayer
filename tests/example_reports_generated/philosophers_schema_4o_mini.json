@@ -1,0 +1,199 @@
+{
+  "philosophers_schema": [
+    {
+      "name": "Laozi",
+      "description": "Known as the author of Daodejing (also known as 'The Classic of the Way and of Virtue'). His idea in Chinese is called Wu Wei (means 'inaction'). By 'inaction' however it doesn't necessarily mean not doing any actions, but to do in bare minimum needed until the rest is done spontaneously.",
+      "area_of_expertise": "Daoism"
+    },
+    {
+      "name": "Confucius",
+      "description": "Known as the most impactful teacher in the whole history of China. He is the author of Analects, which not only includes his teachings, but also how to teach. Ren and Zhi are two fundamental virtues of Confucianism.",
+      "area_of_expertise": "Confucianism"
+    },
+    {
+      "name": "Siddhartha Gautama (Buddha)",
+      "description": "Buddha means 'Awakened One', or 'Enlightened One'. His teaching was to overcome Dukkha ('pain' or 'dissatisfaction') with everyday life.",
+      "area_of_expertise": "Buddhism"
+    },
+    {
+      "name": "Diotima of Mantinea",
+      "description": "She was inspiring to Socrates, and gave the basics of the 'Platonic love' concept (love without sexual desires) to Plato.",
+      "area_of_expertise": "Platonic philosophy"
+    },
+    {
+      "name": "Socrates",
+      "description": "Socrates is described as 'The Gadfly of Athens' by Plato. He tried to understand basic human concerns like ethics, justice, and virtue.",
+      "area_of_expertise": "Ethics"
+    },
+    {
+      "name": "Diogenes of Sinope",
+      "description": "Diogenes is famous for challenging traditions in a violent and insulting way, and the austerity and simplicity of his life based on his Cynic philosophy.",
+      "area_of_expertise": "Cynicism"
+    },
+    {
+      "name": "Plato",
+      "description": "Plato is one of the most impactful philosophers in western philosophy. He was a notable student of Socrates and documented his legal self-defense in the Apology of Socrates.",
+      "area_of_expertise": "Idealism"
+    },
+    {
+      "name": "Aristotle",
+      "description": "Unlike his teacher Plato, Aristotle had a natural approach in philosophy. He was interested in biology, especially studying sea creatures.",
+      "area_of_expertise": "Natural philosophy"
+    },
+    {
+      "name": "Mencius",
+      "description": "Mencius, also known as Mengzi, is one of the most notable Confucianist philosophers. He believed that human nature is righteous and humane.",
+      "area_of_expertise": "Confucianism"
+    },
+    {
+      "name": "Master Zhuang",
+      "description": "He had a simple life in nature far from society, which was consistent with his Taoist beliefs. He is the author of Zhuangzi.",
+      "area_of_expertise": "Taoism"
+    },
+    {
+      "name": "Epicurus",
+      "description": "Epicurus's Liberal Materialism is often misinterpreted as the symbol of extreme hedonism. He believed that the goal of life is to live happily and with pleasure.",
+      "area_of_expertise": "Hedonism"
+    },
+    {
+      "name": "Marcus Aurelius",
+      "description": "He was a Stoic philosopher who became the Roman emperor at the age of 40. He is the author of the 'Meditations'.",
+      "area_of_expertise": "Stoicism"
+    },
+    {
+      "name": "Nagarjuna",
+      "description": "He is one of the most important and impactful Buddhist philosophers. He is the founder of Madhyamaka or 'The Middle Way' school.",
+      "area_of_expertise": "Buddhism"
+    },
+    {
+      "name": "Augustine of Hippo",
+      "description": "He was a theologian and philosopher of Berber origin. He was against slavery and boldly wrote a letter urging the emperor to set up a new law against slave traders.",
+      "area_of_expertise": "Christian philosophy"
+    },
+    {
+      "name": "Hypatia",
+      "description": "She was the most famous astronomer and mathematician of her time, as well as a prominent Neoplatonic teacher and philosopher.",
+      "area_of_expertise": "Neoplatonism"
+    },
+    {
+      "name": "Boethius",
+      "description": "Boethius is one of the greatest philosophers of the classical period. In prison, he wrote his masterpiece 'On the Consolation of Philosophy'.",
+      "area_of_expertise": "Philosophy of mind"
+    },
+    {
+      "name": "Ibn Sina (Avicenna)",
+      "description": "Ibn Sina is the polymath author of 'The Book of Healing' and 'The Canon of Medicine' encyclopedias.",
+      "area_of_expertise": "Islamic philosophy"
+    },
+    {
+      "name": "Anselm",
+      "description": "Known as the father of the scholastic tradition, Anselm was the philosopher monk of Canterbury.",
+      "area_of_expertise": "Scholasticism"
+    },
+    {
+      "name": "Hildegard of Bingen",
+      "description": "Known as 'The Sibyl of the Rhine', she was one of the most impactful composer, philosopher, mystic, visionary, and a medical writer of the Middle Ages.",
+      "area_of_expertise": "Philosophy of religion"
+    },
+    {
+      "name": "H\u00e9lo\u00efse",
+      "description": "Writer, philosopher of love and friendship, and the French nun, H\u00e9lo\u00efse, was one of the pioneers of the feminist thought.",
+      "area_of_expertise": "Feminist philosophy"
+    },
+    {
+      "name": "Ibn Rushd (Averroes)",
+      "description": "He combined Greek and Islamic thoughts. His philosophical works include numerous commentaries on Aristotle.",
+      "area_of_expertise": "Islamic philosophy"
+    },
+    {
+      "name": "Zhu Xi",
+      "description": "He created an impactful philosophical system known as Neo-Confucianism.",
+      "area_of_expertise": "Confucianism"
+    },
+    {
+      "name": "Moses Maimonides",
+      "description": "Maimonides was the physician, the lawyer, and the philosopher who first adapted Aristotle's teachings to Jewish theology.",
+      "area_of_expertise": "Jewish philosophy"
+    },
+    {
+      "name": "Albertus Magnus",
+      "description": "Known as the 'Doctor Universalis' because of the vast of his knowledge. He combined Aristotle's thoughts with Christian teachings.",
+      "area_of_expertise": "Scholasticism"
+    },
+    {
+      "name": "Thomas Aquinas",
+      "description": "He was an Italian Dominican friar and priest, and known as the most influential thinker of the Middle Ages.",
+      "area_of_expertise": "Scholasticism"
+    },
+    {
+      "name": "William of Ockham",
+      "description": "He believed that God cannot be known directly, and God will always be incomprehensible to mankind.",
+      "area_of_expertise": "Nominalism"
+    },
+    {
+      "name": "Desiderius Erasmus",
+      "description": "He was a Humanist philosopher. His most famous book is the 'In praise of Folly'.",
+      "area_of_expertise": "Humanism"
+    },
+    {
+      "name": "Niccolo Machiavelli",
+      "description": "He is most notably known for 'The Prince' book. He advises an imaginary prince about statecraft and politics.",
+      "area_of_expertise": "Political philosophy"
+    },
+    {
+      "name": "Michel de Montaigne",
+      "description": "He was one of the most significant philosophers of the French Renaissance. He popularized essay-writing as a literary genre.",
+      "area_of_expertise": "Renaissance philosophy"
+    },
+    {
+      "name": "Francis Bacon",
+      "description": "Known as the father of empiricism. He was the first philosopher to use a post-Aristotelian method for empirical research.",
+      "area_of_expertise": "Empiricism"
+    },
+    {
+      "name": "Thomas Hobbes",
+      "description": "He was famous for his political philosophy in his book 'Leviathan', and a radical and pessimistic materialist.",
+      "area_of_expertise": "Political philosophy"
+    },
+    {
+      "name": "Ren\u00e9 Descartes",
+      "description": "Cogito ergo sum (I think, therefore I am). Ren\u00e9 Descartes is known as the father of modern philosophy.",
+      "area_of_expertise": "Rationalism"
+    },
+    {
+      "name": "Blaise Pascal",
+      "description": "He was an extraordinary talented person in the field of mathematics to practical inventions, however, his focus was on his spiritual quest.",
+      "area_of_expertise": "Philosophy of religion"
+    },
+    {
+      "name": "Baruch Spinoza",
+      "description": "He studied the philosophy of the philosophers who came before him. He could not accept the absolute distinction between mind and body.",
+      "area_of_expertise": "Rationalism"
+    },
+    {
+      "name": "John Locke",
+      "description": "John Locke's works established the basis of political liberalism and philosophical empiricism.",
+      "area_of_expertise": "Empiricism"
+    },
+    {
+      "name": "Gottfried Wilhelm Leibniz",
+      "description": "Known as the Aristotle of the modern world, he was a thinker who wanted to fill the gap between the God-centered world and the rationalism caused by the scientific revolution.",
+      "area_of_expertise": "Rationalism"
+    },
+    {
+      "name": "Juana In\u00e9s de la Cruz",
+      "description": "She was a poet, scholar, dramatist, and a nun who devoted her life to scientific and philosophical studies.",
+      "area_of_expertise": "Feminist philosophy"
+    },
+    {
+      "name": "George Berkeley",
+      "description": "He was a priest and philosopher who proposed the concept of Subjective Idealism and believed that material objects exist only in the form of perception.",
+      "area_of_expertise": "Idealism"
+    },
+    {
+      "name": "Voltaire",
+      "description": "Voltaire was one of the key figures of the rationalism of the Age of Enlightenment and one of the founders of the modern liberal tradition.",
+      "area_of_expertise": "Liberalism"
+    }
+  ]
+}

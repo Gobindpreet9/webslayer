@@ -1,0 +1,54 @@
+{
+  "philosophers_schema": [
+    {
+      "name": "Aristotle",
+      "description": "Unlike his teacher Plato, Aristotle had a natural approach in philosophy. He was interested in biology, specially studying sea creatures.",
+      "area_of_expertise": "Natural philosophy"
+    },
+    {
+      "name": "Immanuel Kant",
+      "description": "He gave an objection to Anselm's ontological argument.",
+      "area_of_expertise": "Epistemology"
+    },
+    {
+      "name": "Moses Maimonides",
+      "description": "He believed that God's nature will always remain unknown because it is beyond human understanding.",
+      "area_of_expertise": "Theology"
+    },
+    {
+      "name": "Ren\u00e9 Descartes",
+      "description": "Cogito ergo sum (I think, therefore I am). He founded the view of rationalism, and believed that reason is the key to understanding the universe.",
+      "area_of_expertise": "Epistemology"
+    },
+    {
+      "name": "Baruch Spinoza",
+      "description": "He studied the philosophy of the philosophers who came before him specially Blaise Pascal and Thomas Hobbes. His solution was absolute monism instead of Descartes' dualism.",
+      "area_of_expertise": "Metaphysics"
+    },
+    {
+      "name": "John Locke",
+      "description": "Established the basis of political liberalism and philosophical empiricism.",
+      "area_of_expertise": "Philosophy, Politics"
+    },
+    {
+      "name": "Gottfried Wilhelm Leibniz",
+      "description": "Filled the gap between the God-centered world and the rationalism caused by the scientific revolution.",
+      "area_of_expertise": "Mathematics, Philosophy"
+    },
+    {
+      "name": "Juana In\u00e9s de la Cruz",
+      "description": "Argued that throughout the Bible there is no trace of the prohibition of education for women.",
+      "area_of_expertise": "Philosophy, Literature"
+    },
+    {
+      "name": "George Berkeley",
+      "description": "Proposed the concept of Subjective Idealism and believed that material objects exist only in the form of perception.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Voltaire",
+      "description": "Was one of the key figures of the rationalism of the Age of Enlightenment and one of the founders of the modern liberal tradition.",
+      "area_of_expertise": "Philosophy, Politics"
+    }
+  ]
+}

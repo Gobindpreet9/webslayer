@@ -1,0 +1,79 @@
+{
+  "philosophers_schema": [
+    {
+      "name": "Lao Tzu",
+      "description": "Considered one of the founders of Taoism.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Confucius",
+      "description": "Taught ethics, morality, and governance.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Plato",
+      "description": "Founded the Academy in Athens and explored the nature of reality, knowledge, and justice.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Aristotle",
+      "description": "Made significant contributions to various fields, including philosophy, science, and ethics.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Avicenna",
+      "description": "Wrote extensively on philosophy, medicine, and science.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Averroes",
+      "description": "Wrote commentaries on Aristotle's works.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Thomas Aquinas",
+      "description": "Synthesized Aristotelian philosophy with Christian theology.",
+      "area_of_expertise": "Theology"
+    },
+    {
+      "name": "William of Ockham",
+      "description": "Developed the concept of Occam's Razor.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Desiderius Erasmus",
+      "description": "Advocated for reform within the Catholic Church.",
+      "area_of_expertise": "Theology"
+    },
+    {
+      "name": "Niccol\u00f2 Machiavelli",
+      "description": "Wrote The Prince, a treatise on statecraft and politics.",
+      "area_of_expertise": "Politics"
+    },
+    {
+      "name": "Michel de Montaigne",
+      "description": "Popularized the genre of essays.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Francis Bacon",
+      "description": "Advocated for empirical research and scientific inquiry.",
+      "area_of_expertise": "Science"
+    },
+    {
+      "name": "Georg Wilhelm Friedrich Hegel",
+      "description": "Developed the concept of dialectical reasoning.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Karl Marx",
+      "description": "Developed the theory of communism.",
+      "area_of_expertise": "Economics"
+    },
+    {
+      "name": "Bertrand Russell",
+      "description": "Made significant contributions to various fields, including mathematics, philosophy, and politics.",
+      "area_of_expertise": "Philosophy"
+    }
+  ]
+}

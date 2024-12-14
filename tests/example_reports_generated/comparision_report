@@ -1,0 +1,104 @@
+# Comparison of Philosopher Schema Outputs
+
+## 1. philosophers_schema_4o.json (Rating: 9/10)
+- Most comprehensive and detailed entries
+- Consistent formatting and depth of information
+- Well-balanced descriptions covering key contributions and ideas
+- Good mix of biographical and philosophical content
+- Includes 38 philosophers with detailed descriptions
+- Best suited for educational purposes
+
+Strengths:
+- Rich, detailed descriptions
+- Consistent structure
+- Accurate historical context
+- Clear area of expertise definitions
+
+## 2. philosophers_schema_4o_mini.json (Rating: 7/10)
+- Shorter, more concise descriptions
+- Maintains good accuracy but with less detail
+- Same number of philosophers as 4o.json
+- More focused on core contributions
+- Suitable for quick reference
+
+Strengths:
+- Concise information
+- Good for quick overview
+- Maintains essential information
+- Accessible language
+
+## 3. philosophers_schema_4o_no_chunk.json (Rating: 8/10)
+- Similar to 4o.json but with slightly different organization
+- Very detailed descriptions
+- Strong focus on philosophical contributions
+- Excellent historical context
+- 38 philosophers covered
+
+Strengths:
+- Detailed philosophical context
+- Good balance of biography and ideas
+- Comprehensive coverage
+- Well-structured entries
+
+## LLama model used: llama3.1:8b-instruct-q5_0 
+##  name is like schema_chunk_size_chunk_overlap
+
+## 4. philosophers_schema_llama_15000_200.json (Rating: 6/10)
+- 38 philosophers covered
+- More inconsistent in detail level
+- Some entries are quite brief
+- Includes unusual entry (Avestura)
+- More modern interpretation
+
+Strengths:
+- Includes contemporary perspective
+- Good variety of philosophers
+- Clear categorization of expertise
+
+## 5. philosophers_schema_llama_25000_300.json (Rating: 4/10)
+- Very limited selection (only 10 philosophers)
+- Inconsistent detail levels
+- Focus on later philosophers
+- Missing many important historical figures
+- Brief descriptions
+
+Weaknesses:
+- Limited scope
+- Incomplete historical coverage
+- Inconsistent detail level
+
+## 6. philosophers_schema_llama_50000_500.json (Rating: 3/10)
+- Only 15 philosophers
+- Very brief descriptions
+- Oversimplified areas of expertise
+- Missing many key figures
+- Too general in descriptions
+
+Weaknesses:
+- Oversimplified
+- Missing important details
+- Limited historical scope
+- Too general expertise areas
+
+## 7. philosophers_schema_llama_5000_100.json (Rating: 5/10)
+- 22 philosophers covered
+- Inconsistent detail level
+- Some good specific details
+- Unusual formatting in expertise field
+- Mixed quality of descriptions
+
+Strengths:
+- Some good specific details
+- Covers key early philosophers
+- Includes some interesting facts
+
+Overall Ranking (Best to Worst):
+1. philosophers_schema_4o.json
+2. philosophers_schema_4o_no_chunk.json
+3. philosophers_schema_4o_mini.json
+4. philosophers_schema_llama_15000_200.json
+5. philosophers_schema_llama_5000_100.json
+6. philosophers_schema_llama_25000_300.json
+7. philosophers_schema_llama_50000_500.json
+
+The 4o series (4o.json, 4o_no_chunk.json, and 4o_mini.json) are clearly superior in terms of consistency, coverage, and quality of information. The Llama-generated versions show decreasing quality with increasing token sizes, suggesting that the model might be struggling with longer contexts.

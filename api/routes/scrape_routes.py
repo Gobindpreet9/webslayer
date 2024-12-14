@@ -78,7 +78,6 @@ async def start_job(job_request: JobRequest, db: AsyncSession = Depends(get_db))
         
         return {
             "job_id": task.id,
-            "status": "accepted",
             "message": "Job queued for processing"
         }
     except HTTPException as e:
@@ -122,21 +121,18 @@ async def get_job_status(job_id: str, db: AsyncSession = Depends(get_db)):
 
             response = {
                 'status': 'success',
-                'job_id': job_id,
                 'report_name': report_name
             }
         except Exception as e:
             response = {
                 'status': 'failed',
-                'job_id': job_id,
                 'error': f"Failed to create report: {str(e)}"
             }
     else:
         response = {
             'status': task.state.lower(),
-                'job_id': job_id,
-                'result': task.info,
-                'error': "Unexpected task state. Please contact support."
-            }
+            'result': task.info,
+            'error': "Unexpected task state. Please contact support."
+        }
     
     return response 

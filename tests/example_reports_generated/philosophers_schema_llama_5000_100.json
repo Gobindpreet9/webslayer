@@ -1,0 +1,114 @@
+{
+  "philosophers_schema": [
+    {
+      "name": "Laozi",
+      "description": "Author of Daodejing (also known as \"The Classic of the Way and of Virtue\")",
+      "area_of_expertise": "Wu Wei (means \"inaction\")"
+    },
+    {
+      "name": "Confucius",
+      "description": "Most impactful teacher in the whole history of China, author of Analects",
+      "area_of_expertise": "Ren and Zhi are two fundamental virtues of Confucianism. Ren means \"humanity\" and \"goodness\" to help each other, and Zhi means \"Wisdom\" (the ability to distinguish between right and wrong)"
+    },
+    {
+      "name": "Siddhartha Gautama (Buddha)",
+      "description": "Teaching was to overcome Dukkha (\"pain\" or \"dissatisfaction\") with everyday life",
+      "area_of_expertise": "Sila and Samadhi"
+    },
+    {
+      "name": "Diotima of Mantinea",
+      "description": "Inspiring to Socrates, gave the basics of the \"Platonic love\" concept (love without sexual desires) to Plato",
+      "area_of_expertise": "Ladder of Love"
+    },
+    {
+      "name": "Socrates",
+      "description": "Described as \"The Gadfly of Athens\" by Plato, tried to understand basic human concerns like ethics, justice, and virtue",
+      "area_of_expertise": "I know that I know nothing"
+    },
+    {
+      "name": "Diogenes of Sinope",
+      "description": "Famous for challenging traditions in a violent and insulting way, and the austerity and simplicity of his life based on his Cynic philosophy",
+      "area_of_expertise": "Morality implies a return to the simplicity of nature"
+    },
+    {
+      "name": "Plato",
+      "description": "One of the most impactful philosophers in the western philosophy, against the Athenian democracy",
+      "area_of_expertise": "Theory of Forms"
+    },
+    {
+      "name": "Aristotle",
+      "description": "Had a natural approach in philosophy, interested in biology, specially studying sea creatures",
+      "area_of_expertise": "Knowledge should be obtained via natural experiments"
+    },
+    {
+      "name": "Mencius",
+      "description": "Believed that human nature is righteous and humane.",
+      "area_of_expertise": "Confucianist philosophy"
+    },
+    {
+      "name": "Master Zhuang",
+      "description": "Taoist beliefs, author of Zhuangzi.",
+      "area_of_expertise": "Taoism"
+    },
+    {
+      "name": "Epicurus",
+      "description": "Liberal Materialism, goal of life is to live happily and with pleasure.",
+      "area_of_expertise": "Hedonism"
+    },
+    {
+      "name": "Marcus Aurelius",
+      "description": "Stoic philosopher, author of Meditations.",
+      "area_of_expertise": "Stoicism"
+    },
+    {
+      "name": "Nagarjuna",
+      "description": "Founder of Madhyamaka or The Middle Way school.",
+      "area_of_expertise": "Buddhist philosophy"
+    },
+    {
+      "name": "Augustine of Hippo",
+      "description": "Theologian and philosopher, against slavery.",
+      "area_of_expertise": "Christian philosophy"
+    },
+    {
+      "name": "Hypatia",
+      "description": "Astronomer and mathematician, Neoplatonic teacher and philosopher.",
+      "area_of_expertise": "Neoplatonism"
+    },
+    {
+      "name": "Boethius",
+      "description": "One of the greatest philosophers of the classical period.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Ibn Sina (Avicenna)",
+      "description": "Polymath author of The Book of Healing and The Canon of Medicine encyclopedias.",
+      "area_of_expertise": "Philosophy, Science, Medicine"
+    },
+    {
+      "name": "Anselm",
+      "description": "Father of the scholastic tradition.",
+      "area_of_expertise": "Philosophy, Theology"
+    },
+    {
+      "name": "Immanuel Kant",
+      "description": "Philosopher who gave an objection to Anselm's ontological argument.",
+      "area_of_expertise": "Philosophy"
+    },
+    {
+      "name": "Hildegard of Bingen",
+      "description": "Composer, philosopher, mystic, and medical writer of the Middle Ages.",
+      "area_of_expertise": "Philosophy, Music, Medicine"
+    },
+    {
+      "name": "H\u00e9lo\u00efse",
+      "description": "Writer, philosopher of love and friendship, and French nun.",
+      "area_of_expertise": "Philosophy, Literature"
+    },
+    {
+      "name": "Ibn Rushd (Averroes)",
+      "description": "Combined Greek and Islamic thoughts.",
+      "area_of_expertise": "Philosophy, Science"
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "philosophers_schema": [
+    {
+      "name": "Avestura",
+      "description": "Author of this blog post and personal reference for understanding the ideas of great philosophers.",
+      "area_of_expertise": "Computer Science, STEM, Philosophy"
+    },
+    {
+      "name": "Laozi",
+      "description": "Author of Daodejing, known for his idea of Wu Wei (inaction).",
+      "area_of_expertise": "Taoism, Chinese philosophy"
+    },
+    {
+      "name": "Confucius",
+      "description": "Known as the most impactful teacher in China, author of Analects.",
+      "area_of_expertise": "Confucianism, Ethics, Virtue"
+    },
+    {
+      "name": "Siddhartha Gautama (Buddha)",
+      "description": "Taught to overcome Dukkha with everyday life, introduced Sila and Samadhi practices.",
+      "area_of_expertise": "Buddhism, Mindfulness, Meditation"
+    },
+    {
+      "name": "Diotima of Mantinea",
+      "description": "Inspired Socrates, gave the basics of Platonic love concept.",
+      "area_of_expertise": "Platonic Love, Ethics, Virtue"
+    },
+    {
+      "name": "Socrates",
+      "description": "Described as 'The Gadfly of Athens', known for his method of questioning and ideas like 'I know that I know nothing'.",
+      "area_of_expertise": "Ethics, Virtue, Epistemology"
+    },
+    {
+      "name": "Diogenes of Sinope",
+      "description": "Famous for challenging traditions in a violent and insulting way, and the austerity and simplicity of his life based on Cynic philosophy.",
+      "area_of_expertise": "Cynicism, Ethics, Virtue"
+    },
+    {
+      "name": "Plato",
+      "description": "One of the most impactful philosophers in Western philosophy, known for his Theory of Forms and ideas like 'The Republic'.",
+      "area_of_expertise": "Metaphysics, Epistemology, Politics"
+    },
+    {
+      "name": "Aristotle",
+      "description": "Had a natural approach to philosophy, interested in biology and the study of sea creatures.",
+      "area_of_expertise": "Biology, Physics, Metaphysics"
+    },
+    {
+      "name": "Mencius",
+      "description": "One of the most notable Confucianist philosophers, believed that human nature is righteous and humane.",
+      "area_of_expertise": "Confucianism, Ethics, Virtue"
+    },
+    {
+      "name": "Master Zhuang",
+      "description": "Had a simple life in nature far from society, consistent with his Taoist beliefs.",
+      "area_of_expertise": "Taoism, Chinese philosophy"
+    },
+    {
+      "name": "Epicurus",
+      "description": "Believed that the goal of life is to live happily and with pleasure, recommended moderate pleasure and peace of mind.",
+      "area_of_expertise": "Epicureanism, Ethics, Virtue"
+    },
+    {
+      "name": "Marcus Aurelius",
+      "description": "A Stoic philosopher who became the Roman emperor at 40, known for his 'Meditations' and ideas like 'Virtue is the only good'.",
+      "area_of_expertise": "Stoicism, Ethics, Virtue"
+    },
+    {
+      "name": "Nagarjuna",
+      "description": "One of the most important and impactful Buddhist philosophers, founded Madhyamaka or 'The Middle Way' school.",
+      "area_of_expertise": "Buddhism, Epistemology, Metaphysics"
+    },
+    {
+      "name": "Augustine of Hippo",
+      "description": "A theologian and philosopher who was against slavery and boldly wrote a letter urging the emperor to set up a new law.",
+      "area_of_expertise": "Theology, Ethics, Virtue"
+    },
+    {
+      "name": "Hypatia",
+      "description": "One of the most famous astronomers and mathematicians of her time, as well as a prominent Neoplatonic teacher and philosopher.",
+      "area_of_expertise": "Mathematics, Astronomy, Philosophy"
+    },
+    {
+      "name": "Boethius",
+      "description": "One of the greatest philosophers of the classical period, wrote 'On the Consolation of Philosophy' in prison.",
+      "area_of_expertise": "Philosophy, Ethics, Virtue"
+    },
+    {
+      "name": "Ibn Sina (Avicenna)",
+      "description": "A polymath author of 'The Book of Healing' and 'The Canon of Medicine' encyclopedias.",
+      "area_of_expertise": "Medicine, Philosophy, Science"
+    },
+    {
+      "name": "Anselm",
+      "description": "Known as the father of the scholastic tradition, believed that faith is more valuable than logic.",
+      "area_of_expertise": "Theology, Ethics, Virtue"
+    },
+    {
+      "name": "Hildegard of Bingen",
+      "description": "One of the most impactful composer, philosopher, mystic, and medical writer of the Middle Ages.",
+      "area_of_expertise": "Music, Philosophy, Medicine"
+    },
+    {
+      "name": "Ibn Rushd (Averroes)",
+      "description": "Combined Greek and Islamic thoughts, proposed the 'unity of the intellect' philosophical theory.",
+      "area_of_expertise": "Philosophy, Theology, Science"
+    },
+    {
+      "name": "Zhu Xi",
+      "description": "Created an impactful philosophical system which is known as Neo-Confucianism.",
+      "area_of_expertise": "Neo-Confucianism"
+    },
+    {
+      "name": "Moses Maimonides",
+      "description": "Believed that God's nature will always remain unknown because it is beyond human understanding.",
+      "area_of_expertise": "Jewish theology"
+    },
+    {
+      "name": "Albertus Magnus",
+      "description": "Combined Aristotle's thoughts with Christian teachings.",
+      "area_of_expertise": "Christian philosophy"
+    },
+    {
+      "name": "Thomas Aquinas",
+      "description": "Believed that mocking the judgment of reason is mocking the judgment of God, and there is no conflict between philosophy and reason with church beliefs.",
+      "area_of_expertise": "Scholasticism"
+    },
+    {
+      "name": "William of Ockham",
+      "description": "Believed that God can not be known directly, and God will always be incomprehensible to mankind.",
+      "area_of_expertise": "Nominalism"
+    },
+    {
+      "name": "Desiderius Erasmus",
+      "description": "A Humanist philosopher who believed in the importance of humanism.",
+      "area_of_expertise": "Humanism"
+    },
+    {
+      "name": "Niccolo Machiavelli",
+      "description": "Believed that sometimes oppression is better than mercy, and baseness is better than forgiveness.",
+      "area_of_expertise": "Realpolitik"
+    },
+    {
+      "name": "Michel de Montaigne",
+      "description": "Popularized essay-writing as a literary genre.",
+      "area_of_expertise": "Essayism"
+    },
+    {
+      "name": "Francis Bacon",
+      "description": "Believed in the importance of empirical research and the use of reason to improve human life.",
+      "area_of_expertise": "Empiricism"
+    },
+    {
+      "name": "Thomas Hobbes",
+      "description": "Believed that only authoritarian governments can save mankind from the evil consequences of its human nature.",
+      "area_of_expertise": "Leviathan"
+    },
+    {
+      "name": "Ren\u00e9 Descartes",
+      "description": "Founded the view of rationalism and believed that reason is the key to understanding the universe.",
+      "area_of_expertise": "Rationalism"
+    },
+    {
+      "name": "Blaise Pascal",
+      "description": "Propagated a religious doctrine that taught the experience of God through the heart rather than through reason.",
+      "area_of_expertise": "Jansenism"
+    },
+    {
+      "name": "Baruch Spinoza",
+      "description": "Believed in absolute monism and that mind and body are only transformations of a single substance, the substance that creates the world and that is God.",
+      "area_of_expertise": "Spinozism"
+    },
+    {
+      "name": "John Locke",
+      "description": "Established the basis of political liberalism and philosophical empiricism.",
+      "area_of_expertise": "Empiricism"
+    },
+    {
+      "name": "Gottfried Wilhelm Leibniz",
+      "description": "Invented differential and integral calculus and believed in the concept of monads as fundamental elements of existence.",
+      "area_of_expertise": "Monadology"
+    },
+    {
+      "name": "Juana In\u00e9s de la Cruz",
+      "description": "A poet, scholar, dramatist, and a nun who devoted her life to scientific and philosophical studies and the creation of literary works.",
+      "area_of_expertise": "Feminism"
+    },
+    {
+      "name": "George Berkeley",
+      "description": "Proposed the concept of Subjective Idealism and believed that material objects exist only in the form of perception.",
+      "area_of_expertise": "Subjective Idealism"
+    },
+    {
+      "name": "Voltaire",
+      "description": "A key figure of the rationalism of the Age of Enlightenment and one of the founders of the modern liberal tradition.",
+      "area_of_expertise": "Rationalism"
+    }
+  ]
+}
