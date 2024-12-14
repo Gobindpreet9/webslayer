@@ -37,7 +37,7 @@ services:
       ollama:
         condition: service_started
     volumes:
-      - ./ollama-init.sh:/ollama-init.sh
+      - ./backend/ollama-init.sh:/ollama-init.sh
     command: sh /ollama-init.sh
 
 volumes:

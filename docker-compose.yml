@@ -1,6 +1,7 @@
 services:
   webslayer:
-    build: .
+    build: 
+      context: ./backend
     environment:
       - DEFAULT_LLM_MODEL=${DEFAULT_LLM_MODEL:-llama3.1:8b-instruct-q5_0}
     ports:
@@ -15,7 +16,8 @@ services:
         condition: service_started
 
   celery_worker:
-    build: .
+    build: 
+      context: ./backend
     command: >
       python -m debugpy --listen 0.0.0.0:5679
       -m celery -A core.celery_app worker --loglevel=info
@@ -39,7 +41,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
+      - ./backend/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U webslayer_user -d webslayer_db"]
       interval: 5s
