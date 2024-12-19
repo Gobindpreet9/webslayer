@@ -4,9 +4,19 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-gray-50 dark:bg-gray-900;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+/* Add custom background gradients */
+.bg-dashboard-gradient {
+  @apply bg-gradient-to-br from-indigo-600 to-indigo-800 dark:from-indigo-800 dark:to-indigo-950;
+}
+
+/* Add custom text colors */
+.text-dashboard {
+  @apply text-white dark:text-gray-100;
 }
