@@ -9,6 +9,7 @@ services:
       - "5678:5678"
     volumes:
       - webslayer_data:/webslayer
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,6 +26,7 @@ services:
       - "5679:5679"
     volumes:
       - webslayer_data:/webslayer
+      - ./.env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
