@@ -23,6 +23,7 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
         <div>
           <label className="block mb-1">Max Hallucination Checks</label>
           <input
+            name="maxHallucinationChecks"
             type="number"
             value={scraperConfig.maxHallucinationChecks}
             onChange={(e) =>
@@ -40,6 +41,7 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
         <div>
           <label className="block mb-1">Max Quality Checks</label>
           <input
+            name="maxQualityChecks"
             type="number"
             value={scraperConfig.maxQualityChecks}
             onChange={(e) =>
@@ -56,6 +58,7 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
         </div>
         <div className="flex items-center">
           <input
+            name="enableHallucinationCheck"
             type="checkbox"
             checked={scraperConfig.enableHallucinationCheck}
             onChange={(e) =>
@@ -73,6 +76,7 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
         </div>
         <div className="flex items-center">
           <input
+            name="enableQualityCheck"
             type="checkbox"
             checked={scraperConfig.enableQualityCheck}
             onChange={(e) =>
