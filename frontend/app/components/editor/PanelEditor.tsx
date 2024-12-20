@@ -58,30 +58,28 @@ const PanelEditor: React.FC = () => {
     // setJobId("example-job-id");
   }, []);
 
-  if (!status) {
-    return (
-      <div className="text-center text-gray-500">
-        No job running. Start a job from the dashboard.
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Panel Editor</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold text-gray-100">Panel Editor</h2>
 
-      {status.status === "running" && (
-        <div className="text-center text-blue-500">Job is running...</div>
+      {!status && (
+        <div className="text-center text-gray-500 py-8">
+          No job running. Start a job from the dashboard.
+        </div>
       )}
 
-      {status.status === "failed" && (
-        <div className="text-center text-red-500">Error: {status.error}</div>
+      {status?.status === "running" && (
+        <div className="text-center text-blue-500 py-8">Job is running...</div>
       )}
 
-      {status.status === "success" && responseData && (
+      {status?.status === "failed" && (
+        <div className="text-center text-red-500 py-8">Error: {status.error}</div>
+      )}
+
+      {status?.status === "success" && responseData && (
         <div className="space-y-4">
           <textarea
-            className={`w-full h-96 p-4 font-mono rounded border ${
+            className={`w-full h-[calc(100vh-16rem)] p-4 font-mono rounded-md border ${
               isLocked 
                 ? "bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed" 
                 : "bg-gray-700 border-gray-600 text-gray-100 focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
@@ -93,7 +91,7 @@ const PanelEditor: React.FC = () => {
           {!isLocked && (
             <button
               onClick={handleDownload}
-              className="px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded transition-colors"
+              className="px-6 py-2.5 bg-accent-600 hover:bg-accent-700 text-white rounded-md transition-colors font-medium"
             >
               Download JSON
             </button>
