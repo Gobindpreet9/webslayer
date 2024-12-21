@@ -16,9 +16,6 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
 }) => {
   return (
     <section className="mb-6">
-      <h3 className="text-lg font-medium mb-2 text-gray-100">
-        Scraper Configuration
-      </h3>
       <div className="space-y-4">
         <div>
           <label className="block mb-1">Max Hallucination Checks</label>

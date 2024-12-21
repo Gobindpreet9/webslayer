@@ -18,9 +18,8 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
 }) => {
   return (
     <section className="mb-6">
-      <h3 className="text-lg font-medium mb-2 text-gray-100">Crawling Settings</h3>
       <div className="space-y-4">
-        <div className="flex items-center">
+        <div className="flex items-center space-x-2 mb-4">
           <input
             type="checkbox"
             checked={crawlConfig.enableCrawling}
@@ -28,9 +27,9 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
               onConfigChange({ ...crawlConfig, enableCrawling: e.target.checked })
             }
             id="enableCrawling"
-            className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-accent-500 focus:ring-accent-500"
+            className="h-4 w-4 rounded border-gray-300 text-accent-600 focus:ring-accent-500"
           />
-          <label htmlFor="enableCrawling" className="text-gray-200 font-medium">
+          <label htmlFor="enableCrawling" className="text-sm font-medium text-gray-100">
             Enable Crawling
           </label>
         </div>
