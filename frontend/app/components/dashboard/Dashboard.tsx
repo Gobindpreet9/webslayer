@@ -5,42 +5,24 @@ import CrawlConfigForm from "./CrawlConfigForm";
 import ScraperConfigForm from "./ScraperConfigForm";
 import URLList from "./URLList";
 import CollapsibleSection from "./CollapsibleSection";
+import { useConfig } from "~/hooks/useConfig";
+import { useJob } from "~/hooks/useJob";
 
 const Dashboard: React.FC = () => {
+  const { crawlConfig, scraperConfig, llmConfig, updateCrawlConfig, updateScraperConfig, updateLLMConfig } = useConfig();
+  const { jobState, updateJobState } = useJob();
   const actionData = useActionData<JobResponse>();
   const [urls, setUrls] = useState<string[]>([""]);
   const [schema, setSchema] = useState<string>("");
   const [isList, setIsList] = useState<boolean>(false);
   const [urlError, setUrlError] = useState<string | null>(null);
   
-  const [llmConfig, setLlmConfig] = useState<LLMConfig>({
-    llm_model_type: "Ollama",
-    llm_model_name: "llama3.1:8b-instruct-q5_0",
-  });
-
-  const [crawlConfig, setCrawlConfig] = useState<CrawlConfig>({
-    enableCrawling: false,
-    maxDepth: 2,
-    maxUrls: 10,
-    enableChunking: true,
-    chunkSize: 15000,
-    chunkOverlap: 200,
-  });
-
-  const [scraperConfig, setScraperConfig] = useState<ScraperConfig>({
-    maxHallucinationChecks: 2,
-    maxQualityChecks: 2,
-    enableHallucinationCheck: false,
-    enableQualityCheck: false,
-  });
-
   useEffect(() => {
     if (actionData?.status === "accepted") {
-      // Handle successful job start
-      console.log("Job started with ID:", actionData.job_id);
-    } else if (actionData?.error) {
-      // Handle error
-      console.error("Error starting job:", actionData.error);
+      updateJobState({
+        jobId: actionData.job_id,
+        status: actionData
+      });
     }
   }, [actionData]);
 
@@ -141,7 +123,7 @@ const Dashboard: React.FC = () => {
                 <select
                   name="llm_model_type"
                   value={llmConfig.llm_model_type}
-                  onChange={(e) => setLlmConfig({...llmConfig, llm_model_type: e.target.value as LLMConfig["llm_model_type"]})}
+                  onChange={(e) => updateLLMConfig({...llmConfig, llm_model_type: e.target.value as LLMConfig["llm_model_type"]})}
                   className="w-full p-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md"
                 >
                   <option value="Ollama">Ollama</option>
@@ -155,7 +137,7 @@ const Dashboard: React.FC = () => {
                   type="text"
                   name="llm_model_name"
                   value={llmConfig.llm_model_name}
-                  onChange={(e) => setLlmConfig({...llmConfig, llm_model_name: e.target.value})}
+                  onChange={(e) => updateLLMConfig({...llmConfig, llm_model_name: e.target.value})}
                   className="w-full p-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md"
                 />
               </div>
@@ -167,14 +149,14 @@ const Dashboard: React.FC = () => {
           <CollapsibleSection title="Crawling Configuration">
             <CrawlConfigForm
               crawlConfig={crawlConfig}
-              onConfigChange={setCrawlConfig}
+              onConfigChange={updateCrawlConfig}
             />
           </CollapsibleSection>
 
           <CollapsibleSection title="Scraper Configuration">
             <ScraperConfigForm
               scraperConfig={scraperConfig}
-              onConfigChange={setScraperConfig}
+              onConfigChange={updateScraperConfig}
             />
           </CollapsibleSection>
 

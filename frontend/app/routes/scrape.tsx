@@ -3,6 +3,7 @@ import type { JobResponse } from "~/types/types";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
+  
   const jobRequest = {
     urls: formData.getAll("urls").filter(url => url !== ""),
     schema_name: formData.get("schema"),
@@ -21,8 +22,8 @@ export async function action({ request }: ActionFunctionArgs) {
       enable_hallucination_check: formData.get("enableHallucinationCheck") === "true",
       enable_quality_check: formData.get("enableQualityCheck") === "true",
     },
-    llm_model_type: "Ollama",
-    llm_model_name: "llama3.1:8b-instruct-q5_0",
+    llm_model_type: formData.get("llm_model_type"),
+    llm_model_name: formData.get("llm_model_name"),
   };
 
   try {

@@ -1,43 +1,9 @@
-import React, { useState, useEffect } from "react";
-
-interface JobStatus {
-  job_id: string;
-  status: "pending" | "running" | "success" | "failed";
-  result?: any;
-  error?: string;
-}
+import React from "react";
+import { useJob } from "~/hooks/useJob";
 
 const PanelEditor: React.FC = () => {
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [status, setStatus] = useState<JobStatus | null>(null);
-  const [responseData, setResponseData] = useState<any>(null);
-  const [isLocked, setIsLocked] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (jobId) {
-      const interval = setInterval(async () => {
-        try {
-          const res = await fetch(`http://localhost:8000/webslayer/scrape/${jobId}`);
-          const data: JobStatus = await res.json();
-          setStatus(data);
-
-          if (data.status === "success") {
-            setResponseData(data.result);
-            setIsLocked(false);
-            clearInterval(interval);
-          } else if (data.status === "failed") {
-            setResponseData({ error: data.error });
-            setIsLocked(false);
-            clearInterval(interval);
-          }
-        } catch (error) {
-          console.error("Error fetching job status:", error);
-        }
-      }, 5000); // Poll every 5 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [jobId]);
+  const { jobState } = useJob();
+  const { status, responseData, isLocked } = jobState;
 
   const handleDownload = () => {
     const blob = new Blob([JSON.stringify(responseData, null, 2)], {
@@ -50,13 +16,6 @@ const PanelEditor: React.FC = () => {
     link.click();
     URL.revokeObjectURL(url);
   };
-
-  // Placeholder: Replace with actual job_id retrieval logic
-  useEffect(() => {
-    // Example: Listen for job_id updates from a global state or context
-    // For demonstration, assume job_id is received via some mechanism
-    // setJobId("example-job-id");
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -86,7 +45,6 @@ const PanelEditor: React.FC = () => {
             }`}
             value={JSON.stringify(responseData, null, 2)}
             readOnly={isLocked}
-            onChange={(e) => setResponseData(JSON.parse(e.target.value))}
           />
           {!isLocked && (
             <button
