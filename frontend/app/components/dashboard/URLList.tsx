@@ -30,7 +30,6 @@ const URLList: React.FC<URLListProps> = ({
                     ? "border-red-500"
                     : "border-gray-600"
                 } text-gray-100 rounded-md focus:border-accent-500 focus:ring-1 focus:ring-accent-500`}
-                required
               />
               {urls.length > 1 && url && !(index === urls.length - 1 && !url) && (
                 <button

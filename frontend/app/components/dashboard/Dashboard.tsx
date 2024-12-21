@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Form, useActionData } from "@remix-run/react";
-import type { JobResponse, CrawlConfig, ScraperConfig } from "../../types/types";
+import type { JobResponse, CrawlConfig, ScraperConfig, LLMConfig } from "../../types/types";
 import CrawlConfigForm from "./CrawlConfigForm";
 import ScraperConfigForm from "./ScraperConfigForm";
 import URLList from "./URLList";
+import CollapsibleSection from "./CollapsibleSection";
 
 const Dashboard: React.FC = () => {
   const actionData = useActionData<JobResponse>();
@@ -11,6 +12,12 @@ const Dashboard: React.FC = () => {
   const [schema, setSchema] = useState<string>("");
   const [isList, setIsList] = useState<boolean>(false);
   const [urlError, setUrlError] = useState<string | null>(null);
+  
+  const [llmConfig, setLlmConfig] = useState<LLMConfig>({
+    llm_model_type: "Ollama",
+    llm_model_name: "llama3.1:8b-instruct-q5_0",
+  });
+
   const [crawlConfig, setCrawlConfig] = useState<CrawlConfig>({
     enableCrawling: false,
     maxDepth: 2,
@@ -19,6 +26,7 @@ const Dashboard: React.FC = () => {
     chunkSize: 15000,
     chunkOverlap: 200,
   });
+
   const [scraperConfig, setScraperConfig] = useState<ScraperConfig>({
     maxHallucinationChecks: 2,
     maxQualityChecks: 2,
@@ -69,12 +77,38 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    // Validate URLs
+    const validUrls = urls.filter(url => url !== "");
+    if (validUrls.length === 0) {
+      setUrlError("Please enter at least one valid URL");
+      return;
+    }
+
+    // Validate schema
+    if (!schema) {
+      // #todo: add schema error state
+      alert("Please select a schema");
+      return;
+    }
+
+    // If validation passes, submit the form
+    (e.target as HTMLFormElement).submit();
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 space-y-6">
         <h2 className="text-2xl font-semibold mb-6 text-gray-100">Settings</h2>
 
-        <Form method="post" action="/scrape" className="space-y-6">
+        <Form 
+          method="post" 
+          action="/scrape" 
+          className="space-y-6"
+          onSubmit={handleSubmit}
+        >
           <URLList 
             urls={urls}
             urlError={urlError}
@@ -83,42 +117,67 @@ const Dashboard: React.FC = () => {
             onDeleteUrl={deleteUrl}
           />
 
-          {/* Hidden inputs for URLs */}
           {urls.map((url, index) => (
             <input key={index} type="hidden" name="urls" value={url} />
           ))}
 
-          {/* Schema Selection */}
-          <section className="space-y-3">
-            <h3 className="text-lg font-medium text-gray-100">Schema</h3>
+          <CollapsibleSection title="Schema Selection">
             <select
               name="schema"
               value={schema}
               onChange={(e) => setSchema(e.target.value)}
               className="w-full p-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
-              required
             >
-              <option value="" disabled>Select Schema</option>
+              <option value="">Select Schema</option>
               <option value="events_schema">Events Schema</option>
               <option value="users_schema">Users Schema</option>
             </select>
-          </section>
+          </CollapsibleSection>
+
+          <CollapsibleSection title="LLM Configuration">
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-1">Model Type</label>
+                <select
+                  name="llm_model_type"
+                  value={llmConfig.llm_model_type}
+                  onChange={(e) => setLlmConfig({...llmConfig, llm_model_type: e.target.value as LLMConfig["llm_model_type"]})}
+                  className="w-full p-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md"
+                >
+                  <option value="Ollama">Ollama</option>
+                  <option value="Claude">Claude</option>
+                  <option value="OpenAI">OpenAI</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1">Model Name</label>
+                <input
+                  type="text"
+                  name="llm_model_name"
+                  value={llmConfig.llm_model_name}
+                  onChange={(e) => setLlmConfig({...llmConfig, llm_model_name: e.target.value})}
+                  className="w-full p-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md"
+                />
+              </div>
+            </div>
+          </CollapsibleSection>
 
           <input type="hidden" name="isList" value={String(isList)} />
 
-          {isList && (
+          <CollapsibleSection title="Crawling Configuration">
             <CrawlConfigForm
               crawlConfig={crawlConfig}
               onConfigChange={setCrawlConfig}
             />
-          )}
+          </CollapsibleSection>
 
-          <ScraperConfigForm
-            scraperConfig={scraperConfig}
-            onConfigChange={setScraperConfig}
-          />
+          <CollapsibleSection title="Scraper Configuration">
+            <ScraperConfigForm
+              scraperConfig={scraperConfig}
+              onConfigChange={setScraperConfig}
+            />
+          </CollapsibleSection>
 
-          {/* Submit Button */}
           <div className="pt-6">
             <button
               type="submit"

@@ -19,4 +19,9 @@ export interface ScraperConfig {
   maxQualityChecks: number;
   enableHallucinationCheck: boolean;
   enableQualityCheck: boolean;
+}
+
+export interface LLMConfig {
+  llm_model_type: "Ollama" | "Claude" | "OpenAI";
+  llm_model_name: string;
 } 
