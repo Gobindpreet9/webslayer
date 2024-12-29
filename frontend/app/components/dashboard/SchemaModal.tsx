@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useFetcher } from '@remix-run/react';
 
 export interface SchemaField {
   name: string;
@@ -12,14 +13,20 @@ export interface SchemaField {
 interface SchemaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (schema: { name: string; fields: SchemaField[] }) => void;
-  isCreating?: boolean;
+  onSchemaCreated: (schemas: string[]) => void;
 }
 
-const SchemaModal: React.FC<SchemaModalProps> = ({ isOpen, onClose, onSave, isCreating }) => {
+interface SchemaResponse {
+  error?: string;
+  success?: boolean;
+}
+
+const SchemaModal: React.FC<SchemaModalProps> = ({ isOpen, onClose, onSchemaCreated }) => {
+  const fetcher = useFetcher();
   const [schemaName, setSchemaName] = useState("");
   const [fields, setFields] = useState<SchemaField[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const validateForm = () => {
     if (!schemaName.trim()) {
@@ -42,8 +49,42 @@ const SchemaModal: React.FC<SchemaModalProps> = ({ isOpen, onClose, onSave, isCr
 
   const handleSave = () => {
     if (!validateForm()) return;
-    onSave({ name: schemaName, fields });
+
+    const formData = new FormData();
+    formData.append('name', schemaName);
+    formData.append('fields', JSON.stringify(fields));
+
+    fetcher.submit(formData, { 
+      method: "POST",
+      action: "/api/schema",
+    });
   };
+
+  React.useEffect(() => {
+    const data = fetcher.data as SchemaResponse;
+    if (data?.error) {
+      setError(typeof data.error === 'string' ? data.error : 'An error occurred');
+      setSuccessMessage(null);
+    } else if (data?.success) {
+      setSuccessMessage(`Schema "${schemaName}" created successfully!`);
+      setError(null);
+      
+      // Fetch updated schema list after a short delay
+      setTimeout(() => {
+        fetcher.load("/api/schema");
+        onClose();
+        setSchemaName("");
+        setFields([]);
+        setSuccessMessage(null);
+      }, 2000); // Show success message for 2 seconds
+    }
+  }, [fetcher.data]);
+
+  React.useEffect(() => {
+    if (fetcher.data && Array.isArray(fetcher.data)) {
+      onSchemaCreated(fetcher.data);
+    }
+  }, [fetcher.data]);
 
   const addField = () => {
     setFields([...fields, {
@@ -71,6 +112,12 @@ const SchemaModal: React.FC<SchemaModalProps> = ({ isOpen, onClose, onSave, isCr
         {error && (
           <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded text-red-500">
             {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-4 p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded text-green-500">
+            {successMessage}
           </div>
         )}
 
@@ -134,10 +181,10 @@ const SchemaModal: React.FC<SchemaModalProps> = ({ isOpen, onClose, onSave, isCr
           </button>
           <button
             onClick={handleSave}
-            disabled={isCreating}
+            disabled={fetcher.state === "submitting"}
             className="px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-md disabled:opacity-50"
           >
-            {isCreating ? "Creating..." : "Save Schema"}
+            {fetcher.state === "submitting" ? "Saving..." : "Save Schema"}
           </button>
         </div>
       </div>

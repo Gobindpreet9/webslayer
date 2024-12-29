@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useFetcher } from "@remix-run/react";
 import type { JobResponse, CrawlConfig, ScraperConfig, LLMConfig } from "../../types/types";
 import CrawlConfigForm from "./CrawlConfigForm";
 import ScraperConfigForm from "./ScraperConfigForm";
@@ -19,8 +19,9 @@ const Dashboard: React.FC = () => {
   const [isList, setIsList] = useState<boolean>(false);
   const [urlError, setUrlError] = useState<string | null>(null);
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState<boolean>(false);
-  const [isCreatingSchema, setIsCreatingSchema] = useState(false);
   const [schemas, setSchemas] = useState<string[]>([]);
+  const fetcher = useFetcher();
+  const [schemaNotification, setSchemaNotification] = useState<string | null>(null);
 
   useEffect(() => {
     if (actionData?.status === "accepted") {
@@ -30,6 +31,16 @@ const Dashboard: React.FC = () => {
       });
     }
   }, [actionData]);
+
+  useEffect(() => {
+    fetcher.load("/api/schema");
+  }, []);
+
+  useEffect(() => {
+    if (fetcher.data && Array.isArray(fetcher.data)) {
+      setSchemas(fetcher.data);
+    }
+  }, [fetcher.data]);
 
   const handleUrlChange = (index: number, value: string) => {
     const newUrls = [...urls];
@@ -84,53 +95,13 @@ const Dashboard: React.FC = () => {
     (e.target as HTMLFormElement).submit();
   };
 
-  const fetchSchemas = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/webslayer/schema/");
-      if (response.ok) {
-        const data = await response.json();
-        setSchemas(data);
-      }
-    } catch (error) {
-      console.error("Error fetching schemas:", error);
+  const handleSchemaChange = (value: string) => {
+    setSchema(value);
+    if (value) {
+      setSchemaNotification(`Schema "${value}" selected`);
+      setTimeout(() => setSchemaNotification(null), 2000);
     }
   };
-
-  const handleSchemaCreate = async (schema: { name: string; fields: SchemaField[] }) => {
-    setIsCreatingSchema(true);
-    try {
-      const response = await fetch("http://localhost:8000/webslayer/schema/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(schema),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Failed to create schema");
-      }
-
-      // Close modal and refresh schemas
-      setIsSchemaModalOpen(false);
-      await fetchSchemas();
-      
-      // Show success message
-      alert("Schema created successfully!");
-    } catch (error) {
-      console.error("Error creating schema:", error);
-      alert(error instanceof Error ? error.message : "Failed to create schema. Please try again.");
-    } finally {
-      setIsCreatingSchema(false);
-    }
-  };
-
-  // Add useEffect to fetch schemas on component mount
-  useEffect(() => {
-    fetchSchemas();
-  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -142,6 +113,7 @@ const Dashboard: React.FC = () => {
           action="/scrape" 
           className="space-y-6"
           onSubmit={handleSubmit}
+          preventScrollReset
         >
           <URLList 
             urls={urls}
@@ -161,7 +133,7 @@ const Dashboard: React.FC = () => {
                 <select
                   name="schema"
                   value={schema}
-                  onChange={(e) => setSchema(e.target.value)}
+                  onChange={(e) => handleSchemaChange(e.target.value)}
                   className="flex-1 p-2.5 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:border-accent-500 focus:ring-1 focus:ring-accent-500"
                 >
                   <option value="">Select Schema</option>
@@ -181,6 +153,12 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </CollapsibleSection>
+
+          {schemaNotification && (
+            <div className="mt-2 p-2 bg-green-500 bg-opacity-20 border border-green-500 rounded text-green-500 text-sm">
+              {schemaNotification}
+            </div>
+          )}
 
           <CollapsibleSection title="LLM Configuration">
             <div className="space-y-4">
@@ -239,8 +217,7 @@ const Dashboard: React.FC = () => {
         <SchemaModal
           isOpen={isSchemaModalOpen}
           onClose={() => setIsSchemaModalOpen(false)}
-          onSave={handleSchemaCreate}
-          isCreating={isCreatingSchema}
+          onSchemaCreated={setSchemas}
         />
       </div>
     </div>

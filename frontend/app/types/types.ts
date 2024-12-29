@@ -24,4 +24,18 @@ export interface ScraperConfig {
 export interface LLMConfig {
   llm_model_type: "Ollama" | "Claude" | "OpenAI";
   llm_model_name: string;
+}
+
+export interface SchemaField {
+  name: string;
+  field_type: "string" | "integer" | "float" | "boolean" | "list" | "dict" | "date";
+  description?: string;
+  required: boolean;
+  list_item_type?: string;
+  default_value?: any;
+}
+
+export interface Schema {
+  name: string;
+  fields: SchemaField[];
 } 
