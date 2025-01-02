@@ -6,6 +6,7 @@ import { JobStatusResponse } from "~/types/types";
 export function useJob() {
   const context = useContext(JobContext);
   const fetcher = useFetcher<JobStatusResponse>();
+  const reportFetcher = useFetcher();
 
   if (!context) {
     throw new Error("useJob must be used within a JobProvider");
@@ -23,12 +24,18 @@ export function useJob() {
       if (fetcher.data) {
         console.log("Job status fetched");
         console.log(fetcher.data);
+
+        if (fetcher.data.status === "success" && fetcher.data.report_name) {
+          // Fetch report data when job succeeds
+          reportFetcher.load(`/api/reports/${fetcher.data.report_name}`);
+        }
+
         updateJobState({
           status: {
             status: fetcher.data.status,
             error: fetcher.data.error
           },
-          responseData: fetcher.data.status === "success" ? fetcher.data.result : null,
+          responseData: reportFetcher.data || null,
           isLocked: !["success", "failed"].includes(fetcher.data.status),
         });
 
@@ -39,7 +46,7 @@ export function useJob() {
 
       return () => clearInterval(interval);
     }
-  }, [jobState.jobId, fetcher.data]);
+  }, [jobState.jobId, fetcher.data, reportFetcher.data]);
 
   return context;
 } 

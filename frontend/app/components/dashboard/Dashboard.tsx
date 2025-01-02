@@ -199,10 +199,10 @@ const Dashboard: React.FC = () => {
           <div className="pt-6">
             <button
               type="submit"
-              disabled={jobState.status?.status === "running" || jobState.status?.status === "accepted"}
+              disabled={jobState.status?.status === "pending" || jobState.status?.status === "accepted"}
               className="w-full p-3 bg-accent-600 hover:bg-accent-700 text-white rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {jobState.status?.status === "running" || jobState.status?.status === "accepted" 
+              {jobState.status?.status === "pending" || jobState.status?.status === "accepted" 
                 ? "Processing..." 
                 : "Start Scraping"}
             </button>

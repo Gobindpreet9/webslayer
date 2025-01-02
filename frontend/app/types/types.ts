@@ -4,7 +4,7 @@ export interface JobCreationResponse {
 }
 
 export interface JobStatusResponse {
-  status: "accepted" | "failed" | "running" | "success";
+  status: "accepted" |"failed" | "pending" | "success";
   error?: string;
   result?: any;
   report_name?: string;

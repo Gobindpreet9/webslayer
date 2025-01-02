@@ -62,4 +62,15 @@ export async function createSchema({ name, fields }: SchemaCreateRequest) {
   }
 
   return { success: true };
+}
+
+export async function getReport(reportName: string): Promise<any> {
+  const response = await fetch(`${ENV.API_URL}/reports/${reportName}`);
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || "Failed to fetch report");
+  }
+
+  return response.json();
 } 

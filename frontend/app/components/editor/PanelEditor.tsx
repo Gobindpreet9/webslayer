@@ -34,7 +34,7 @@ const PanelEditor: React.FC = () => {
         </div>
       )}
 
-      {status?.status === "running" && (
+      {status?.status === "pending" && (
         <div className="text-center text-blue-500 py-8">
           <div className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mr-2" />
           Job is running...
