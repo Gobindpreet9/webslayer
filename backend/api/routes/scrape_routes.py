@@ -98,10 +98,7 @@ async def get_job_status(job_id: str, db: AsyncSession = Depends(get_db)):
             'status': 'pending'
         }
     elif task.state == 'FAILURE' or task.info.get('status') == 'failed':
-        response = {
-            'status': 'failed',
-            'error': str(task.info)
-        }
+        response = task.info
     elif task.state == 'SUCCESS' and task.info.get('status') == 'completed':
         try:
             # Create report name using timestamp

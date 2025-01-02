@@ -27,12 +27,24 @@ const PanelEditor: React.FC = () => {
         </div>
       )}
 
+      {status?.status === "accepted" && (
+        <div className="text-center text-blue-500 py-8">
+          <div className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mr-2" />
+          Job is queued and will start soon...
+        </div>
+      )}
+
       {status?.status === "running" && (
-        <div className="text-center text-blue-500 py-8">Job is running...</div>
+        <div className="text-center text-blue-500 py-8">
+          <div className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mr-2" />
+          Job is running...
+        </div>
       )}
 
       {status?.status === "failed" && (
-        <div className="text-center text-red-500 py-8">Error: {status.error}</div>
+        <div className="text-center text-red-500 py-8">
+          Error: {status.error}
+        </div>
       )}
 
       {status?.status === "success" && responseData && (

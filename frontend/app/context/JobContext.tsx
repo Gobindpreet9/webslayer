@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useReducer } from "react";
-import type { JobResponse, CrawlConfig, ScraperConfig, LLMConfig } from "../types/types";
+import type { JobCreationResponse, JobStatusResponse, CrawlConfig, ScraperConfig, LLMConfig } from "../types/types";
 
 interface JobState {
   jobId: string | null;
-  status: JobResponse | null;
+  status: JobStatusResponse | null;
   responseData: any;
   isLocked: boolean;
 }

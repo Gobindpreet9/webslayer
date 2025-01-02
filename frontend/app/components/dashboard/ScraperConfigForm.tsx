@@ -17,6 +17,42 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
   return (
     <section className="mb-6">
       <div className="space-y-4">
+      <div className="flex items-center">
+          <input
+            name="enableHallucinationCheck"
+            type="checkbox"
+            checked={scraperConfig.enableHallucinationCheck}
+            onChange={(e) =>
+              onConfigChange({
+                ...scraperConfig,
+                enableHallucinationCheck: e.target.checked,
+              })
+            }
+            id="enableHallucinationCheck"
+            className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-accent-500 focus:ring-accent-500"
+          />
+          <label htmlFor="enableHallucinationCheck" className="text-gray-200 font-medium ml-2">
+            Enable Hallucination Check
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            name="enableQualityCheck"
+            type="checkbox"
+            checked={scraperConfig.enableQualityCheck}
+            onChange={(e) =>
+              onConfigChange({
+                ...scraperConfig,
+                enableQualityCheck: e.target.checked,
+              })
+            }
+            id="enableQualityCheck"
+            className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-accent-500 focus:ring-accent-500"
+          />
+          <label htmlFor="enableQualityCheck" className="text-gray-200 font-medium ml-2">
+            Enable Quality Check
+          </label>
+        </div>
         <div>
           <label className="block mb-1">Max Hallucination Checks</label>
           <input
@@ -52,42 +88,6 @@ const ScraperConfigForm: React.FC<ScraperConfigFormProps> = ({
             max={5}
             required
           />
-        </div>
-        <div className="flex items-center">
-          <input
-            name="enableHallucinationCheck"
-            type="checkbox"
-            checked={scraperConfig.enableHallucinationCheck}
-            onChange={(e) =>
-              onConfigChange({
-                ...scraperConfig,
-                enableHallucinationCheck: e.target.checked,
-              })
-            }
-            id="enableHallucinationCheck"
-            className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-accent-500 focus:ring-accent-500"
-          />
-          <label htmlFor="enableHallucinationCheck" className="text-gray-200 font-medium ml-2">
-            Enable Hallucination Check
-          </label>
-        </div>
-        <div className="flex items-center">
-          <input
-            name="enableQualityCheck"
-            type="checkbox"
-            checked={scraperConfig.enableQualityCheck}
-            onChange={(e) =>
-              onConfigChange({
-                ...scraperConfig,
-                enableQualityCheck: e.target.checked,
-              })
-            }
-            id="enableQualityCheck"
-            className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-accent-500 focus:ring-accent-500"
-          />
-          <label htmlFor="enableQualityCheck" className="text-gray-200 font-medium ml-2">
-            Enable Quality Check
-          </label>
         </div>
       </div>
     </section>

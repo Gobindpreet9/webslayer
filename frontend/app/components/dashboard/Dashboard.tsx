@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, useActionData, useFetcher } from "@remix-run/react";
-import type { JobResponse, CrawlConfig, ScraperConfig, LLMConfig } from "../../types/types";
+import type { JobCreationResponse, CrawlConfig, ScraperConfig, LLMConfig } from "../../types/types";
 import CrawlConfigForm from "./CrawlConfigForm";
 import ScraperConfigForm from "./ScraperConfigForm";
 import URLList from "./URLList";
@@ -13,24 +13,25 @@ import type { SchemaField } from "./SchemaModal";
 const Dashboard: React.FC = () => {
   const { crawlConfig, scraperConfig, llmConfig, updateCrawlConfig, updateScraperConfig, updateLLMConfig } = useConfig();
   const { jobState, updateJobState } = useJob();
-  const actionData = useActionData<JobResponse>();
   const [urls, setUrls] = useState<string[]>([""]);
   const [schema, setSchema] = useState<string>("");
   const [isList, setIsList] = useState<boolean>(false);
   const [urlError, setUrlError] = useState<string | null>(null);
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState<boolean>(false);
   const [schemas, setSchemas] = useState<string[]>([]);
-  const fetcher = useFetcher();
-  const [schemaNotification, setSchemaNotification] = useState<string | null>(null);
+  const fetcher = useFetcher<JobCreationResponse>();
 
   useEffect(() => {
-    if (actionData?.status === "accepted") {
+    console.log("fetcher.data:", fetcher.data);
+    if (fetcher.data && 'job_id' in fetcher.data) {
       updateJobState({
-        jobId: actionData.job_id,
-        status: actionData
+        jobId: fetcher.data.job_id,
+        status: {
+          status: "accepted",
+        }
       });
     }
-  }, [actionData]);
+  }, [fetcher.data]);
 
   useEffect(() => {
     fetcher.load("/api/schema");
@@ -83,24 +84,26 @@ const Dashboard: React.FC = () => {
       setUrlError("Please enter at least one valid URL");
       return;
     }
-
+  
     // Validate schema
     if (!schema) {
-      // #todo: add schema error state
       alert("Please select a schema");
       return;
     }
-
-    // If validation passes, submit the form
-    (e.target as HTMLFormElement).submit();
+  
+    // Submit using fetcher instead of fetch
+    const formData = new FormData(e.target as HTMLFormElement);
+    formData.set("llm_model_type", llmConfig.llm_model_type);
+    formData.set("llm_model_name", llmConfig.llm_model_name);
+    
+    fetcher.submit(formData, {
+      method: "POST",
+      action: "/scrape"
+    });
   };
 
   const handleSchemaChange = (value: string) => {
     setSchema(value);
-    if (value) {
-      setSchemaNotification(`Schema "${value}" selected`);
-      setTimeout(() => setSchemaNotification(null), 2000);
-    }
   };
 
   return (
@@ -122,10 +125,6 @@ const Dashboard: React.FC = () => {
             onAddUrl={addUrlField}
             onDeleteUrl={deleteUrl}
           />
-
-          {urls.map((url, index) => (
-            <input key={index} type="hidden" name="urls" value={url} />
-          ))}
 
           <CollapsibleSection title="Schema Selection">
             <div className="space-y-4">
@@ -153,13 +152,6 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </CollapsibleSection>
-
-          {schemaNotification && (
-            <div className="mt-2 p-2 bg-green-500 bg-opacity-20 border border-green-500 rounded text-green-500 text-sm">
-              {schemaNotification}
-            </div>
-          )}
-
           <CollapsibleSection title="LLM Configuration">
             <div className="space-y-4">
               <div>
@@ -207,9 +199,12 @@ const Dashboard: React.FC = () => {
           <div className="pt-6">
             <button
               type="submit"
-              className="w-full p-3 bg-accent-600 hover:bg-accent-700 text-white rounded-md transition-colors font-medium"
+              disabled={jobState.status?.status === "running" || jobState.status?.status === "accepted"}
+              className="w-full p-3 bg-accent-600 hover:bg-accent-700 text-white rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Start Scraping
+              {jobState.status?.status === "running" || jobState.status?.status === "accepted" 
+                ? "Processing..." 
+                : "Start Scraping"}
             </button>
           </div>
         </Form>

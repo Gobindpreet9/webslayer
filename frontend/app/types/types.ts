@@ -1,8 +1,13 @@
-export interface JobResponse {
+export interface JobCreationResponse {
   job_id: string;
+  message: string;
+}
+
+export interface JobStatusResponse {
   status: "accepted" | "failed" | "running" | "success";
   error?: string;
   result?: any;
+  report_name?: string;
 }
 
 export interface CrawlConfig {

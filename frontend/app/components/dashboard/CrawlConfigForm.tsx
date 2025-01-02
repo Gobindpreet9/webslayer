@@ -22,6 +22,7 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
         <div className="flex items-center space-x-2 mb-4">
           <input
             type="checkbox"
+            name="enableCrawling"
             checked={crawlConfig.enableCrawling}
             onChange={(e) =>
               onConfigChange({ ...crawlConfig, enableCrawling: e.target.checked })
@@ -40,9 +41,10 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
               <label className="block mb-1">Max Depth</label>
               <input
                 type="number"
+                name="maxDepth"
                 value={crawlConfig.maxDepth}
                 onChange={(e) =>
-                  onConfigChange({ ...crawlConfig, maxDepth: Number(e.target.value) })
+                  onConfigChange({ ...crawlConfig, maxDepth: Math.max(1, Number(e.target.value)) })
                 }
                 className="w-full p-2 border border-gray-300 rounded"
                 min={1}
@@ -54,9 +56,10 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
               <label className="block mb-1">Max URLs</label>
               <input
                 type="number"
+                name="maxUrls"
                 value={crawlConfig.maxUrls}
                 onChange={(e) =>
-                  onConfigChange({ ...crawlConfig, maxUrls: Number(e.target.value) })
+                  onConfigChange({ ...crawlConfig, maxUrls: Math.max(1, Number(e.target.value)) })
                 }
                 className="w-full p-2 border border-gray-300 rounded"
                 min={1}
@@ -68,6 +71,7 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
               <label className="block mb-1">Enable Chunking</label>
               <input
                 type="checkbox"
+                name="enableChunking"
                 checked={crawlConfig.enableChunking}
                 onChange={(e) =>
                   onConfigChange({ ...crawlConfig, enableChunking: e.target.checked })
@@ -80,13 +84,14 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
               <label className="block mb-1">Chunk Size</label>
               <input
                 type="number"
+                name="chunkSize"
                 value={crawlConfig.chunkSize}
                 onChange={(e) =>
-                  onConfigChange({ ...crawlConfig, chunkSize: Number(e.target.value) })
+                  onConfigChange({ ...crawlConfig, chunkSize: Math.max(1000, Number(e.target.value)) })
                 }
                 className="w-full p-2 border border-gray-300 rounded"
-                min={1}
-                max={1000}
+                min={1000}
+                max={1000000}
                 required
               />
             </div>
@@ -94,13 +99,14 @@ const CrawlConfigForm: React.FC<CrawlConfigFormProps> = ({
               <label className="block mb-1">Chunk Overlap</label>
               <input
                 type="number"
+                name="chunkOverlap"
                 value={crawlConfig.chunkOverlap}
                 onChange={(e) =>
-                  onConfigChange({ ...crawlConfig, chunkOverlap: Number(e.target.value) })
+                  onConfigChange({ ...crawlConfig, chunkOverlap: Math.max(0, Number(e.target.value)) })
                 }
                 className="w-full p-2 border border-gray-300 rounded"
                 min={0}
-                max={1000}
+                max={100000}
                 required
               />
             </div>

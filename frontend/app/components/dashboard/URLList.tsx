@@ -22,6 +22,7 @@ const URLList: React.FC<URLListProps> = ({
             <div className="flex items-center gap-3">
               <input
                 type="url"
+                name="urls"
                 value={url}
                 onChange={(e) => onUrlChange(index, e.target.value)}
                 placeholder="https://example.com"

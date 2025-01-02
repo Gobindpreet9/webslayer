@@ -1,9 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { SchemaField } from "~/types/types";
+import { getSchemas, createSchema } from "~/utils/api.server";
+import type { SchemaField } from "~/types/types";
 
-const API_URL = "http://localhost:8000/webslayer/schema/";
-
-// Helper function for error responses
 const handleApiError = (error: any, defaultMessage: string) => {
   const message = error?.detail || defaultMessage;
   const status = error?.status || 500;
@@ -12,13 +10,10 @@ const handleApiError = (error: any, defaultMessage: string) => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      return handleApiError(await response.json(), "Failed to fetch schemas");
-    }
-    return json(await response.json());
+    const schemas = await getSchemas();
+    return json(schemas);
   } catch (error) {
-    return handleApiError(error, "Server error");
+    return handleApiError(error, "Failed to fetch schemas");
   }
 }
 
@@ -29,23 +24,13 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     const formData = await request.formData();
-    const name = formData.get('name');
+    const nameValue = formData.get('name');
+    const name = typeof nameValue === 'string' ? nameValue : null;
     const fields = JSON.parse(formData.get('fields') as string);
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, fields }),
-    });
-
-    if (!response.ok) {
-      return handleApiError(await response.json(), "Failed to create schema");
-    }
-
-    return json({ success: true });
+    const result = await createSchema({ name, fields });
+    return json(result);
   } catch (error) {
-    return handleApiError(error, "Server error");
+    return handleApiError(error, "Failed to create schema");
   }
 }

@@ -10,6 +10,6 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - BACKEND_URL=http://webslayer:8000
+      - API_URL=http://webslayer:8000/webslayer
     depends_on:
       - webslayer
