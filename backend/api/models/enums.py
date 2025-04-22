@@ -13,4 +13,4 @@ class ModelType(str, Enum):
     ollama = "Ollama"
     claude = "Claude"
     openai = "OpenAI"
- 
+    gemini = "Gemini"

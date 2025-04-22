@@ -27,7 +27,7 @@ export interface ScraperConfig {
 }
 
 export interface LLMConfig {
-  llm_model_type: "Ollama" | "Claude" | "OpenAI";
+  llm_model_type: "Ollama" | "Claude" | "OpenAI" | "Gemini";
   llm_model_name: string;
 }
 

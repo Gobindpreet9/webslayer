@@ -7,6 +7,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from core.settings import Settings
 from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 settings = Settings()
 
@@ -59,7 +60,7 @@ class Agent(ABC):
         """
         Method configures the LLM instance based on the selected model type.
         """
-        if self.model_type == ModelType.claude or self.model_type == ModelType.openai:
+        if self.model_type == ModelType.claude or self.model_type == ModelType.openai or self.model_type == ModelType.gemini:
             if not settings.API_KEY:
                 raise ValueError(f"{self.model_type} API key is required in settings")
             
@@ -71,13 +72,21 @@ class Agent(ABC):
                     timeout=None,
                     max_retries=2
                 )
-            else:  # OpenAI
+            elif self.model_type == ModelType.openai:  # OpenAI
                 self.llm = ChatOpenAI(
                     api_key=settings.API_KEY,
                     model=self.local_model_name,
                     temperature=0,
                     timeout=None,
                     max_retries=2
+                )
+            elif self.model_type == ModelType.gemini:
+                self.llm = ChatGoogleGenerativeAI(
+                    model=self.local_model_name,
+                    temperature=0,
+                    max_tokens=None,
+                    timeout=None,
+                    google_api_key=settings.API_KEY
                 )
         elif self.model_type == ModelType.ollama:
             self.llm = OllamaLLM(

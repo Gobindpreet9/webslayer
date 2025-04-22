@@ -165,6 +165,7 @@ const Dashboard: React.FC = () => {
                   <option value="Ollama">Ollama</option>
                   <option value="Claude">Claude</option>
                   <option value="OpenAI">OpenAI</option>
+                  <option value="Gemini">Gemini</option>
                 </select>
               </div>
               <div>
