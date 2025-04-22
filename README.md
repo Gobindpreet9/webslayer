@@ -14,6 +14,7 @@ Webslayer is an in-development tool that leverages the power of LLMs and AI agen
 ### Prerequisites
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed
 - Copy or create a `.env` file in the project root (already present)
+- Check models available on Ollama or have a valid API key for OpenAI, Claude or Gemini
 
 ### Common Setups
 
@@ -21,7 +22,7 @@ Webslayer is an in-development tool that leverages the power of LLMs and AI agen
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.frontend.yml -f docker-compose.ollama.yml -f docker-compose.override.yml up --build
 ```
-- Backend API: http://localhost:8000
+- Backend API: http://localhost:8000/docs
 - Frontend (Remix): http://localhost:5173
 - Ollama (LLM): http://localhost:11434
 - PgAdmin: http://localhost:5050
