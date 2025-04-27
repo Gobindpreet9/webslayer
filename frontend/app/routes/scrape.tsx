@@ -1,49 +1,65 @@
-import { ActionFunctionArgs, json } from "@remix-run/node";
-import { startScrapeJob } from "~/utils/api.server";
-import type { JobCreationResponse } from "~/types/types";
+import { type ActionFunctionArgs, json } from "@remix-run/node";
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const enableCrawling = formData.get("enableCrawling") === "true";
-  
-  const jobRequest = {
-    urls: formData.getAll("urls").filter(url => url !== ""),
-    schema_name: formData.get("schema"),
-    return_schema_list: formData.get("isList") === "true",
-    crawl_config: enableCrawling ? {
-      enable_crawling: true,
-      max_depth: Number(formData.get("maxDepth")),
-      max_urls: Number(formData.get("maxUrls")),
-      enable_chunking: formData.get("enableChunking") === "true",
-      chunk_size: Number(formData.get("chunkSize")),
-      chunk_overlap: Number(formData.get("chunkOverlap")),
-    } : {
-      enable_crawling: false,
-      max_depth: 2,
-      max_urls: 3,
-      enable_chunking: true,
-      chunk_size: 5000,
-      chunk_overlap: 100
-    },
-    scraper_config: {
-      max_hallucination_checks: Number(formData.get("maxHallucinationChecks")),
-      max_quality_checks: Number(formData.get("maxQualityChecks")),
-      enable_hallucination_check: formData.get("enableHallucinationCheck") === "true",
-      enable_quality_check: formData.get("enableQualityCheck") === "true",
-    },
-    llm_model_type: String(formData.get("llm_model_type")),
-    llm_model_name: String(formData.get("llm_model_name")),
-  };
+// Define Backend URL and specific endpoint
+const BACKEND_API_URL = process.env.BACKEND_URL || "http://localhost:8000";
+const JOB_ENDPOINT = `${BACKEND_API_URL}/webslayer/jobs`;
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  if (request.method !== "POST") {
+    return json({ error: "Method Not Allowed" }, { status: 405 });
+  }
 
   try {
-    const data = await startScrapeJob(jobRequest);
-    return json(data);
-  } catch (error: any) {
-    return json({ 
-      error: error.message || "Failed to start scraping job",
-      status: "failed" 
-    }, { 
-      status: error.status || 500 
+    // 1. Read the JSON payload sent from Dashboard.tsx
+    const projectPayload = await request.json();
+
+    // Optional: Add validation for projectPayload here if needed
+    console.log("Received payload for /scrape:", projectPayload);
+
+    // 2. Forward the payload to the backend job creation endpoint
+    const response = await fetch(JOB_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(projectPayload),
     });
+
+    // 3. Handle backend response
+    const responseData = await response.json(); // Attempt to parse JSON regardless of status
+
+    if (!response.ok) {
+      console.error(`Backend job creation error: ${response.status}`, responseData);
+      // Return an error structure compatible with Dashboard's useEffect
+      return json(
+        {
+          error: responseData.detail || `Backend Error (${response.status})`,
+          status: "failed",
+        },
+        { status: response.status }
+      );
+    }
+
+    // Job started successfully, return the backend response (should contain job_id)
+    console.log("Job creation successful:", responseData);
+    return json(responseData, { status: response.status });
+
+  } catch (error: any) {
+    console.error("Error processing /scrape request:", error);
+    // Handle potential JSON parsing errors or network issues
+    let errorMessage = "Failed to start scraping job";
+    if (error instanceof SyntaxError) {
+      errorMessage = "Invalid JSON payload received";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    return json(
+      {
+        error: errorMessage,
+        status: "failed",
+      },
+      { status: 500 }
+    );
   }
-} 
+};

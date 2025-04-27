@@ -4,10 +4,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from api.models import SchemaDefinition as SchemaDefinitionPydantic, Report as ReportPydantic, ReportFilter
 from api.models.report import ReportMetadata
+from api.models.project import Project as ProjectPydantic, ProjectCreate, ProjectUpdate
 from core.adapters.data_adapter_interface import DataAdapterInterface
 from core.models.schema import SchemaDefinition, SchemaField
-from sqlalchemy.orm import selectinload
+from core.models.project import Project as ProjectSQL
 from core.models.report import Report
+from sqlalchemy.orm import selectinload
+import uuid
+from datetime import datetime
 
 class PostgresAdapter(DataAdapterInterface):
     async def get_all_schemas(self, db: AsyncSession) -> List[SchemaDefinitionPydantic]:
@@ -178,4 +182,108 @@ class PostgresAdapter(DataAdapterInterface):
             raise HTTPException(
                 status_code=500,
                 detail=f"Failed to delete report: {str(e)}"
+            )
+
+    # --- Project CRUD Methods ---
+
+    async def create_project(self, db: AsyncSession, project: ProjectCreate) -> ProjectPydantic:
+        try:
+            # Check if project name already exists before creating
+            existing = await self.get_project_by_name(db, project.name)
+            if existing:
+                raise HTTPException(status_code=409, detail=f"Project with name '{project.name}' already exists.")
+
+            db_project = ProjectSQL(**project.model_dump())
+            db.add(db_project)
+            await db.commit()
+            await db.refresh(db_project)
+            return db_project.to_pydantic()
+        except HTTPException as http_exc:
+            await db.rollback() # Rollback for HTTPException as well if it's the 409 conflict
+            raise http_exc
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to create project: {str(e)}"
+            )
+
+    # Renamed from get_project_by_id
+    async def get_project_by_name(self, db: AsyncSession, project_name: str) -> Optional[ProjectPydantic]:
+        try:
+            result = await db.execute(
+                select(ProjectSQL).where(ProjectSQL.name == project_name) # Use name for lookup
+            )
+            project = result.scalar_one_or_none()
+            if project:
+                return project.to_pydantic()
+            return None
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to retrieve project: {str(e)}"
+            )
+
+    async def get_all_projects(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> List[ProjectPydantic]:
+        try:
+            result = await db.execute(
+                select(ProjectSQL).offset(skip).limit(limit)
+            )
+            projects = result.scalars().all()
+            return [project.to_pydantic() for project in projects]
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to retrieve projects: {str(e)}"
+            )
+
+    # Updated parameter from project_id to project_name
+    async def update_project(self, db: AsyncSession, project_name: str, project_update: ProjectUpdate) -> Optional[ProjectPydantic]:
+        try:
+            # Fetch the existing project first by name
+            existing_project_sql = await db.scalar(
+                select(ProjectSQL).where(ProjectSQL.name == project_name)
+            )
+            if not existing_project_sql:
+                return None # Signal not found
+
+            update_data = project_update.model_dump(exclude_unset=True)
+
+            # Ensure updated_at is set
+            if update_data: # Only update if there are changes
+                update_data['updated_at'] = datetime.utcnow()
+                stmt = (
+                    update(ProjectSQL)
+                    .where(ProjectSQL.name == project_name) # Use name for update condition
+                    .values(**update_data)
+                    .returning(ProjectSQL)
+                )
+                result = await db.execute(stmt)
+                updated_project_sql = result.scalar_one()
+                await db.commit()
+                return updated_project_sql.to_pydantic()
+            else:
+                # No changes provided, return existing project data
+                return existing_project_sql.to_pydantic()
+
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to update project: {str(e)}"
+            )
+
+    # Updated parameter from project_id to project_name
+    async def delete_project(self, db: AsyncSession, project_name: str) -> bool:
+        try:
+            result = await db.execute(
+                delete(ProjectSQL).where(ProjectSQL.name == project_name) # Use name for delete condition
+            )
+            await db.commit()
+            return result.rowcount > 0
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to delete project: {str(e)}"
             )
