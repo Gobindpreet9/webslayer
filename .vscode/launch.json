@@ -37,10 +37,10 @@
             "justMyCode": true
         },
         {
-            "name": "Python Debugger: Main",
+            "name": "Python Debugger: Webslayer backend",
             "type": "debugpy",
             "request": "launch",
-            "program": "main.py",
+            "program": "backend/main.py",
             "console": "integratedTerminal"
         },
         {

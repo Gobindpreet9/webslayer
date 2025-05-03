@@ -35,6 +35,18 @@ CREATE TABLE reports (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
+CREATE TABLE projects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    urls JSONB,
+    llm_type VARCHAR(50),
+    llm_model_name VARCHAR(100),
+    schema_name VARCHAR(255) REFERENCES schema_definitions(name) ON DELETE CASCADE,
+    crawl_config JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 CREATE INDEX idx_schema_fields_schema_definition_name ON schema_fields(schema_definition_name);
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -52,6 +64,11 @@ CREATE TRIGGER update_schema_definitions_updated_at
 
 CREATE TRIGGER update_schema_fields_updated_at
     BEFORE UPDATE ON schema_fields
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_projects_updated_at
+    BEFORE UPDATE ON projects
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 

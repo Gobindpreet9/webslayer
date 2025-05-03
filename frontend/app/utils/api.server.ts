@@ -7,6 +7,17 @@ interface SchemaCreateRequest {
   fields: SchemaField[];
 }
 
+// --- Project Types ---
+export interface Project {
+  id?: string;
+  name: string;
+  urls: string[];
+  crawl_config?: any;
+  scraper_config?: any;
+  llm_config?: any;
+  schema_name?: string;
+}
+
 export async function startScrapeJob(jobRequest: any): Promise<JobCreationResponse> {
   const response = await fetch(`${ENV.API_URL}/scrape/start`, {
     method: "POST",
@@ -73,4 +84,35 @@ export async function getReport(reportName: string): Promise<any> {
   }
 
   return response.json();
-} 
+}
+
+// --- Project API ---
+export async function getProjects(): Promise<Project[]> {
+  const response = await fetch(`${ENV.API_URL}/projects`, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Failed to fetch projects");
+  }
+  return response.json();
+}
+
+export async function createOrUpdateProject(project: Project): Promise<Project> {
+  const response = await fetch(`${ENV.API_URL}/projects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify(project),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Failed to create/update project");
+  }
+  return response.json();
+}

@@ -159,21 +159,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-// Define types for the action response shapes
-type ActionSuccessResponse = { success: true; job?: JobCreationResponse };
-type ActionErrorResponse = { success: false; error: string; status: string };
-type ActionResponse = ActionSuccessResponse | ActionErrorResponse;
-
-// Type guard for Success Response
-function isSuccessResponse(data: any): data is ActionSuccessResponse {
-  return data && data.success === true && typeof data.job !== 'undefined';
-}
-
-// Type guard for Error Response
-function isErrorResponse(data: any): data is ActionErrorResponse {
-  return data && data.success === false && typeof data.error === 'string';
-}
-
 // Update meta tags based on project name
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const projectName = data?.projectDetails?.name ?? "Project";
@@ -200,16 +185,12 @@ export default function ProjectView() {
   // Calculate feedback message outside JSX for better type narrowing
   let feedbackMessage: React.ReactNode | null = null;
   if (actionData) {
-    // Use type guards for narrowing
-    if (isSuccessResponse(actionData)) {
-      // actionData is now correctly typed as ActionSuccessResponse
-      feedbackMessage = `Job started successfully! Job ID: ${actionData.job?.job_id}`;
-    } else if (isErrorResponse(actionData)) {
-      // actionData is now correctly typed as ActionErrorResponse
-      feedbackMessage = `Error: ${actionData.error}`;
+    if (actionData.success) {
+      // Only access job if it exists
+      feedbackMessage = `Job started successfully! Job ID: ${'job' in actionData && actionData.job ? actionData.job.job_id : ''}`;
     } else {
-      // Handle unexpected shape if necessary
-      feedbackMessage = "An unexpected response was received.";
+      // Only access error if it exists
+      feedbackMessage = `Error: ${'error' in actionData ? actionData.error : ''}`;
     }
   }
 
@@ -218,9 +199,8 @@ export default function ProjectView() {
       <h1 className="text-2xl md:text-3xl font-bold mb-6">{projectDetails.name}</h1>
       
       {/* Display feedback message if it exists */}
-      {feedbackMessage && (
-        // Use the type guards again for styling, or rely on the message calculation
-        <div className={`p-4 mb-4 rounded ${isSuccessResponse(actionData) ? 'bg-green-900 text-green-100' : 'bg-red-900 text-red-100'}`}>
+      {feedbackMessage && actionData && (
+        <div className={`p-4 mb-4 rounded ${actionData.success ? 'bg-green-900 text-green-100' : 'bg-red-900 text-red-100'}`}>
           {feedbackMessage}
         </div>
       )}

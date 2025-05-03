@@ -77,19 +77,6 @@ export default function ProjectsDashboard() {
     }
   }, [fetcher.state, fetcher.data, revalidator]); 
 
-  const handleCreateClick = () => {
-    if (!newProjectName.trim()) {
-      alert("Please enter a project name.");
-      return;
-    }
-    const payload = { name: newProjectName.trim() };
-    fetcher.submit(payload, {
-      method: "POST",
-      action: "/api/projects", 
-      encType: "application/json",
-    });
-  };
-
   return (
     <Layout>
       <div className="container mx-auto p-4 md:p-6 lg:p-8">
@@ -108,7 +95,8 @@ export default function ProjectsDashboard() {
 
         {/* Conditional Input Form */}
         {showInput && (
-          <fetcher.Form method="post" action="/api/projects" onSubmit={(e) => { e.preventDefault(); handleCreateClick(); }} className="mb-6 flex items-center gap-2 p-4 border border-gray-700 rounded-md bg-gray-800 shadow">
+          <fetcher.Form method="post" action="/api/projects" 
+              className="mb-6 flex items-center gap-2 p-4 border border-gray-700 rounded-md bg-gray-800 shadow">
               <input
                 type="text"
                 name="name" // Name attribute for potential non-JS fallback

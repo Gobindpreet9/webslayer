@@ -16,7 +16,11 @@ type ProjectPayload = {
   schema_name: string;
   llm_type: LLMConfig['llm_model_type'];
   llm_model_name: string;
-  crawl_config: Omit<CrawlConfig, 'enableChunking' | 'chunkSize' | 'chunkOverlap'>;
+  crawl_config: {
+    enable_crawling: boolean;
+    max_depth: number;
+    max_urls: number;
+  };
 };
 
 const Dashboard: React.FC = () => {
@@ -141,13 +145,16 @@ const Dashboard: React.FC = () => {
       llm_type: llmConfig.llm_model_type,
       llm_model_name: llmConfig.llm_model_name,
       crawl_config: {
-        enableCrawling: crawlConfig.enableCrawling,
-        maxDepth: crawlConfig.maxDepth,
-        maxUrls: crawlConfig.maxUrls,
+        enable_crawling: crawlConfig.enableCrawling,
+        max_depth: crawlConfig.maxDepth,
+        max_urls: crawlConfig.maxUrls,
       },
     };
 
     setLastSubmittedPayload(projectPayload);
+
+    // Debug: Log payload before submit
+    console.log('Submitting project payload:', JSON.stringify(projectPayload, null, 2));
 
     fetcher.submit(projectPayload, {
       method: "POST",
