@@ -26,8 +26,14 @@ export interface ScraperConfig {
   enableQualityCheck: boolean;
 }
 
+// Define the allowed providers as a const array
+export const LLM_MODEL_TYPE_OPTIONS = ["Ollama", "Claude", "OpenAI", "Gemini"] as const;
+
+// Use the array to infer the union type
+export type LLMModelType = typeof LLM_MODEL_TYPE_OPTIONS[number];
+
 export interface LLMConfig {
-  llm_model_type: "Ollama" | "Claude" | "OpenAI" | "Gemini";
+  llm_model_type: LLMModelType;
   llm_model_name: string;
 }
 
