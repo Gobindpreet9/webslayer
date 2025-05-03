@@ -140,7 +140,8 @@ export default function ProjectsDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Access projects safely because loaderData.error is false */}
             {loaderData.projects.map((project: Project) => (
-              <Link key={project.id} to={`/projects/${project.id}`} className="block hover:no-underline">
+              // FIX: Use project.name (URL encoded) in the link instead of project.id
+              <Link key={project.id} to={`/projects/${encodeURIComponent(project.name)}`} className="block hover:no-underline">
                 <div className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col justify-between bg-gray-800 border-gray-700">
                   <div>
                     <h2 className="text-lg font-semibold mb-2 truncate text-white">{project.name}</h2>

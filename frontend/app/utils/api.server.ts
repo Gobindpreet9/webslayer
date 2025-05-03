@@ -101,6 +101,25 @@ export async function getProjects(): Promise<Project[]> {
   return response.json();
 }
 
+// Fetch a single project by its NAME
+export async function getProjectByName(projectName: string): Promise<Project> {
+  // Assuming endpoint uses the name, potentially URL encoded
+  const encodedProjectName = encodeURIComponent(projectName);
+  // TODO: Verify this is the correct backend endpoint for fetching by name
+  const response = await fetch(`${ENV.API_URL}/projects/${encodedProjectName}`, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    // Use projectName in the error message
+    throw new Error(error.detail || `Failed to fetch project ${projectName} (${response.status})`);
+  }
+  return response.json();
+}
+
 export async function createOrUpdateProject(project: Project): Promise<Project> {
   const response = await fetch(`${ENV.API_URL}/projects`, {
     method: "POST",

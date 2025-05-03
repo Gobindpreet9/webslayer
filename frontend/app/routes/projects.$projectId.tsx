@@ -7,97 +7,49 @@ import { useState, useMemo } from 'react';
 import { Pencil } from 'lucide-react'; // Import Pencil icon
 
 import Layout from "~/components/layout/Layout";
-import UrlListInput from '~/components/project/UrlListInput'; 
-import { startScrapeJob } from "~/utils/api.server";
-import type { JobCreationResponse } from "~/types/types";
+import UrlListInput from '~/components/project/UrlListInput';
+// Import API functions and types - Use getProjectByName, remove getModels etc.
+import { startScrapeJob, getProjectByName, getSchemas } from "~/utils/api.server";
+import type { Project } from "~/utils/api.server"; // Import Project type
+import type { LLMConfig, Schema } from "~/types/types"; // Import LLMConfig
 
-// Define Schema type (based on backend structure)
-type Schema = {
-  id: string;
-  name: string;
-  // Potentially add fields definition here later
+// Define the expected structure of the data returned by the action function
+type ActionData = {
+  success: boolean;
+  message?: string;
+  job_id?: string;
 };
 
-// Define Model types (based on backend structure)
-type Model = {
-  name: string; // e.g., 'gpt-4', 'llama2'
-  provider: string; // e.g., 'OpenAI', 'Ollama'
-};
-
-// Group models by provider for easier selection
-type ModelProvider = {
-  name: string;
-  models: Model[];
-};
-
-// TODO: Define actual ProjectDetails type based on backend API
-type ProjectDetails = {
-  id: string;
-  name: string;
-  urls: string[];
-  schemaName: string | null;
-  crawlEnabled: boolean;
-  modelProvider: string | null;
-  modelName: string | null;
-  // ... other project details
-};
-
-// Placeholder loader function - replace with actual API call
+// Loader function using API calls
 export async function loader({ params }: LoaderFunctionArgs) {
-  invariant(params.projectId, "Missing projectId param");
-  const projectId = params.projectId;
+  // Although named projectId, treat it as the project name based on user feedback
+  invariant(params.projectId, "Missing projectId (project name) param");
+  const projectName = params.projectId; 
+  // --- Add logging --- 
+  console.log(`--- Loading project details for name: '${projectName}' ---`);
 
-  // TODO: Fetch project details from backend API using projectId
-  // const projectDetailsData = await fetch(`/api/projects/${projectId}`).then(res => res.json());
+  try {
+    // Fetch project details and schemas concurrently. Removed models fetch.
+    const [projectDetailsData, schemasData] = await Promise.all([
+      getProjectByName(projectName), // Use name
+      getSchemas() // Assuming this returns Schema[]
+    ]);
 
-  // TODO: Fetch available schemas from backend API
-  // const schemasData = await fetch(`/api/schemas`).then(res => res.json());
+    const projectDetails: Project = projectDetailsData;
+    const availableSchemas: string[] = schemasData;
 
-  // TODO: Fetch available AI models from backend API
-  // const modelsData = await fetch(`/api/models`).then(res => res.json());
+    // Return fetched data - Removed availableModels
+    return json({ projectDetails, availableSchemas });
 
-  // Dummy data for now
-  const projectDetails: ProjectDetails = {
-    id: projectId,
-    name: `Project ${projectId.replace("proj_","")}`,
-    urls: [`https://example.com/${projectId}`],
-    schemaName: "Default Schema",
-    crawlEnabled: false,
-    modelProvider: "OpenAI",
-    modelName: "gpt-3.5-turbo",
-  };
-
-  const availableSchemas: Schema[] = [
-    { id: 'schema_1', name: 'Default Schema' },
-    { id: 'schema_2', name: 'Product Details (Title, Price, Image)' },
-    { id: 'schema_3', name: 'Article Data (Headline, Author, Date)' },
-  ];
-
-  // Dummy data for AI models
-  const availableModels: ModelProvider[] = [
-    {
-      name: 'OpenAI',
-      models: [
-        { name: 'gpt-4', provider: 'OpenAI' },
-        { name: 'gpt-3.5-turbo', provider: 'OpenAI' },
-      ]
-    },
-    {
-      name: 'Ollama',
-      models: [
-        { name: 'llama2', provider: 'Ollama' },
-        { name: 'mistral', provider: 'Ollama' },
-      ]
-    },
-    // TODO: Add other providers like Claude, Gemini
-  ];
-
-  if (!projectDetails) {
-    throw new Response("Project Not Found", { status: 404 });
+  } catch (error) {
+    console.error("Error fetching project data:", error);
+    // Handle specific errors, e.g., 404 Not Found
+    if (error instanceof Error && error.message.includes('Failed to fetch project')) {
+       throw new Response("Project Not Found", { status: 404 });
+    }
+    // Throw a generic server error for other issues
+    throw new Response("Error loading project data", { status: 500 });
   }
-
-  // Return project details, schemas, and models
-  return json({ projectDetails, availableSchemas, availableModels });
 }
 
 // Remix Action Function to handle form submission (start scrape job)
@@ -145,16 +97,16 @@ export async function action({ request }: ActionFunctionArgs) {
     const data = await startScrapeJob(jobRequest);
     console.log("Job Start Response:", data);
     // Return success response, potentially with job ID
-    return json({ success: true, job: data as JobCreationResponse }); // Add type assertion for clarity if needed
+    return json<ActionData>({ success: true, job_id: data.job_id });
   } catch (error: any) {
     console.error("Job Start Error:", error);
-    // Return error response
-    return json({
-      success: false,
-      error: error.message || "Failed to start scraping job",
-      status: "failed"
-    }, {
-      status: error.status || 500
+    // Return data matching the ActionData type
+    // Status goes in the second argument (ResponseInit)
+    return json<ActionData>({ 
+      success: false, 
+      message: error.message || "Failed to start scraping job" 
+    }, { 
+      status: error.status || 500 
     });
   }
 }
@@ -169,53 +121,70 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export default function ProjectView() {
-  // Destructure availableSchemas and availableModels from loader data
-  const { projectDetails, availableSchemas, availableModels } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>(); // Explicitly use the defined union type? No, Remix handles this.
+  // Use the Project type imported from api.server.ts - removed availableModels
+  const { projectDetails, availableSchemas } = useLoaderData<{
+    projectDetails: Project;
+    availableSchemas: string[]; // Type set to string[]
+  }>();
+  // Use the local ActionData type
+  const actionData = useActionData<ActionData>(); 
 
+  // --- State Definitions --- MUST be before they are used below
   // State to manage the currently selected provider to filter models
   const [selectedProvider, setSelectedProvider] = useState(
-    projectDetails.modelProvider || (availableModels.length > 0 ? availableModels[0].name : '')
+    projectDetails.llm_config?.llm_model_type || '' // Use snake_case from Project type
   );
-  
-  // State for results editor
+  // State for selected model name
+  const [selectedModel, setSelectedModel] = useState(
+    projectDetails.llm_config?.llm_model_name || '' // Use snake_case from Project type
+  );
+  // State for editable results content
   const [isEditingResults, setIsEditingResults] = useState(false);
-  const [resultsContent, setResultsContent] = useState("// Sample Results - Replace with actual fetched results\n{\n  \"title\": \"Example Product\",\n  \"price\": 99.99\n}"); // TODO: Load actual results
+  // Initialize results content - TODO: Fetch real results later
+  const [resultsContent, setResultsContent] = useState(''); 
 
-  // Calculate feedback message outside JSX for better type narrowing
-  let feedbackMessage: React.ReactNode | null = null;
-  if (actionData) {
-    if (actionData.success) {
-      // Only access job if it exists
-      feedbackMessage = `Job started successfully! Job ID: ${'job' in actionData && actionData.job ? actionData.job.job_id : ''}`;
-    } else {
-      // Only access error if it exists
-      feedbackMessage = `Error: ${'error' in actionData ? actionData.error : ''}`;
-    }
-  }
+  // --- Derived State --- REMOVED selectedProviderModels
+
+  // Define available LLM providers based on LLMConfig type
+  // Note: This assumes LLMConfig['llm_model_type'] is a union like 'Ollama' | 'Claude' | ...
+  // If the type definition changes, this needs updating.
+  const availableProviders: LLMConfig['llm_model_type'][] = ['Ollama', 'Claude', 'OpenAI', 'Gemini']; // Manually list based on type
+
+  // Reset model selection if provider changes (optional)
+  // useEffect(() => {
+  //   setSelectedModel(''); // Or set to the first available model?
+  // }, [selectedProvider]);
+
+  // --- Add logging to check the data --- 
+  console.log('--- ProjectView Component: availableSchemas ---', availableSchemas);
 
   return (
     <Layout>
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">{projectDetails.name}</h1>
-      
-      {/* Display feedback message if it exists */}
-      {feedbackMessage && actionData && (
-        <div className={`p-4 mb-4 rounded ${actionData.success ? 'bg-green-900 text-green-100' : 'bg-red-900 text-red-100'}`}>
-          {feedbackMessage}
+      <h1 className="text-2xl font-bold mb-4">{projectDetails.name}</h1>
+      {/* Display feedback from action */}
+      {actionData?.success && (
+        <div className="bg-green-800 border border-green-600 text-green-100 px-4 py-3 rounded relative mb-4" role="alert">
+          <strong className="font-bold">Success!</strong>
+          {/* Use optional chaining for job_id */}
+          <span className="block sm:inline"> Scraping job started{actionData.job_id ? ` with ID: ${actionData.job_id}` : ''}</span>
+        </div>
+      )}
+      {!actionData?.success && actionData?.message && (
+        <div className="bg-red-800 border border-red-600 text-red-100 px-4 py-3 rounded relative mb-4" role="alert">
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline"> {actionData.message}</span>
         </div>
       )}
 
-      {/* Wrap configuration and results in a Form for potential saving/submission */}
-      {/* Set form method to post to trigger the action function */}
-      <Form method="post"> 
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6"> 
+      <Form method="post">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6">
           {/* Column 1: Configuration */}
           <div className="space-y-6">
             {/* Section 1: URLs */}
             <div className="p-4 border rounded-lg bg-gray-800 border-gray-700 shadow-sm">
               <h2 className="text-xl font-semibold mb-3">Target URLs</h2>
               <UrlListInput 
-                initialUrls={projectDetails.urls} 
+                initialUrls={projectDetails.urls || []} 
                 inputName="urls" 
               />
             </div>
@@ -227,15 +196,16 @@ export default function ProjectView() {
                 <select 
                   id="schemaName"
                   name="schemaName" 
-                  defaultValue={projectDetails.schemaName || ''} 
+                  defaultValue={projectDetails.schema_name || ''} // Use snake_case
                   className="flex-grow p-2 border rounded bg-gray-700 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500 text-sm"
                 >
-                  <option value="" disabled={projectDetails.schemaName !== null}>
+                  <option value="" disabled={!!projectDetails.schema_name}>
                     -- Select a Schema --
                   </option>
-                  {availableSchemas.map(schema => (
-                    <option key={schema.id} value={schema.name}>
-                      {schema.name}
+                  {/* Map directly over schema names (strings) */}
+                  {availableSchemas.map(schemaName => (
+                    <option key={schemaName} value={schemaName}> 
+                      {schemaName}
                     </option>
                   ))}
                 </select>
@@ -258,12 +228,10 @@ export default function ProjectView() {
                   type="checkbox" 
                   id="crawlEnabled" 
                   name="crawlEnabled" 
-                  defaultChecked={projectDetails.crawlEnabled} 
-                  className="h-4 w-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                  defaultChecked={projectDetails.crawl_config?.enable_crawling || false} // Use snake_case and provide default
+                  className="h-4 w-4 text-blue-600 border-gray-500 rounded focus:ring-blue-500 mr-2 bg-gray-700"
                 />
-                <label htmlFor="crawlEnabled" className="text-sm font-medium text-gray-300">
-                  Enable crawling (follow links)
-                </label>
+                <label htmlFor="crawlEnabled" className="text-sm text-gray-300">Enable Crawling</label> {/* Corrected label text */} 
               </div>
               {/* TODO: Add inputs for max_depth, max_urls etc. if crawling is enabled */}
             </div>
@@ -274,36 +242,37 @@ export default function ProjectView() {
               <div className="space-y-3">
                 {/* Provider Selection */}
                 <div>
-                  <label htmlFor="modelProvider" className="block text-sm font-medium text-gray-300 mb-1">Provider</label>
+                  <label htmlFor="modelProvider" className="block text-sm font-medium text-gray-300 mb-1">AI Provider</label>
                   <select 
                     id="modelProvider"
                     name="modelProvider" 
-                    value={selectedProvider} // Controlled component
+                    value={selectedProvider}
                     onChange={(e) => setSelectedProvider(e.target.value)} 
                     className="w-full p-2 border rounded bg-gray-700 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500 text-sm"
                   >
                     <option value="" disabled={!!selectedProvider}>
                       -- Select Provider --
                     </option>
-                    {availableModels.map(provider => (
-                      <option key={provider.name} value={provider.name}>
-                        {provider.name}
+                    {/* Map over providers derived from LLMConfig */}
+                    {availableProviders.map(provider => (
+                      <option key={provider} value={provider}>
+                        {provider}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Model Name Selection (changed to text input) */}
+                {/* Model Name Selection - Changed back to text input */}
                 <div>
                   <label htmlFor="modelName" className="block text-sm font-medium text-gray-300 mb-1">Model Name</label>
                   <input 
                     type="text"
                     id="modelName"
                     name="modelName" 
-                    defaultValue={projectDetails.modelName || ''} 
-                    disabled={!selectedProvider}
-                    placeholder={selectedProvider ? "Enter model name (e.g., gpt-4)" : "Select provider first"}
-                    className="w-full p-2 border rounded bg-gray-700 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500 text-sm disabled:opacity-50"
+                    value={selectedModel || ''} // Use state variable
+                    onChange={(e) => setSelectedModel(e.target.value)} // Use state setter
+                    placeholder="Enter model name (e.g., gpt-4-turbo)"
+                    className="w-full p-2 border rounded bg-gray-700 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                 </div>
               </div>
