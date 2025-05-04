@@ -11,17 +11,29 @@ const UrlListInput: React.FC<UrlListInputProps> = ({ initialUrls, inputName }) =
   const [newUrl, setNewUrl] = useState<string>('');
 
   const handleAddUrl = () => {
-    if (newUrl.trim() && !urls.includes(newUrl.trim())) {
-      // Basic validation: non-empty and not duplicate
-      // TODO: Add more robust URL validation
-      try {
-        new URL(newUrl.trim()); // Check if it's a valid URL structure
-        setUrls([...urls, newUrl.trim()]);
-        setNewUrl(''); // Clear input field
-      } catch (_) {
-        // TODO: Show user feedback for invalid URL format
-        alert('Invalid URL format');
+    const trimmedUrl = newUrl.trim();
+
+    if (!trimmedUrl) {
+      alert('URL cannot be empty.');
+      return;
+    }
+
+    if (urls.includes(trimmedUrl)) {
+      alert('URL already exists in the list.');
+      return;
+    }
+
+    try {
+      const parsedUrl = new URL(trimmedUrl);
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        alert('Invalid URL: Must start with http:// or https://');
+        return;
       }
+      // URL is valid and not a duplicate
+      setUrls([...urls, trimmedUrl]);
+      setNewUrl(''); // Clear input field
+    } catch (_) {
+      alert('Invalid URL format.');
     }
   };
 
@@ -39,8 +51,8 @@ const UrlListInput: React.FC<UrlListInputProps> = ({ initialUrls, inputName }) =
   return (
     <div className="space-y-2">
       {/* Render hidden inputs for each URL to be included in form submission */}
-      {urls.map((url, index) => (
-        <input key={`hidden-url-${index}`} type="hidden" name={inputName} value={url} />
+      {urls.map((url) => (
+        <input key={url} type="hidden" name={inputName} value={url} />
       ))}
 
       {/* List of current URLs */}
@@ -48,8 +60,8 @@ const UrlListInput: React.FC<UrlListInputProps> = ({ initialUrls, inputName }) =
         {urls.length === 0 ? (
           <li className="text-gray-500 italic list-none">No URLs added yet.</li>
         ) : (
-          urls.map((url, index) => (
-            <li key={`url-${index}`} className="flex justify-between items-center group">
+          urls.map((url) => (
+            <li key={url} className="flex justify-between items-center group">
               <span className="text-gray-300 break-all">{url}</span>
               <button 
                 type="button" 
