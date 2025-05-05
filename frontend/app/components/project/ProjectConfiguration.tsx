@@ -17,10 +17,10 @@ const ProjectConfiguration: React.FC<ProjectConfigurationProps> = ({
   actionData 
 }) => {
   const [selectedProvider, setSelectedProvider] = useState(
-    projectDetails.llm_config?.llm_model_type || ''
+    projectDetails.llm_type || ''
   );
   const [selectedModel, setSelectedModel] = useState(
-    projectDetails.llm_config?.llm_model_name || ''
+    projectDetails.llm_model_name || ''
   );
 
   return (
@@ -124,19 +124,6 @@ const ProjectConfiguration: React.FC<ProjectConfigurationProps> = ({
           Start Scraping Job
         </button>
       </div>
-
-      {actionData?.success && (
-        <div className="bg-green-800 border border-green-600 text-green-100 px-4 py-3 rounded relative mt-4" role="alert">
-          <strong className="font-bold">Success!</strong>
-          <span className="block sm:inline"> Scraping job started{actionData.job_id ? ` with ID: ${actionData.job_id}` : ''}</span>
-        </div>
-      )}
-      {!actionData?.success && actionData?.message && (
-        <div className="bg-red-800 border border-red-600 text-red-100 px-4 py-3 rounded relative mt-4" role="alert">
-          <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline"> {actionData.message}</span>
-        </div>
-      )}
     </div> 
   );
 };

@@ -7,15 +7,21 @@ interface SchemaCreateRequest {
   fields: SchemaField[];
 }
 
+export interface CrawlConfig {
+  enable_crawling: boolean;
+  max_depth: number;
+  max_urls: number;
+}
+
 // --- Project Types ---
 export interface Project {
   id?: string;
   name: string;
   urls: string[];
-  crawl_config?: any;
-  scraper_config?: any;
-  llm_config?: any;
+  llm_type: string;
+  llm_model_name: string;
   schema_name?: string;
+  crawl_config: CrawlConfig;
 }
 
 export async function startScrapeJob(jobRequest: any): Promise<JobCreationResponse> {

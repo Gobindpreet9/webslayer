@@ -4,7 +4,7 @@ import { Form, useLoaderData, useParams, useActionData } from "@remix-run/react"
 import invariant from "tiny-invariant";
 
 import Layout from "~/components/layout/Layout";
-import { startScrapeJob, getProjectByName, getSchemas } from "~/utils/api.server";
+import { startScrapeJob, getProjectByName, getSchemas, createOrUpdateProject } from "~/utils/api.server";
 import type { Project } from "~/utils/api.server"; 
 
 import ProjectHeader from '~/components/project/ProjectHeader';
@@ -38,51 +38,55 @@ export async function loader({ params }: LoaderFunctionArgs) {
   }
 }
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const enableCrawling = formData.get("crawlEnabled") === "on"; 
+export async function action({ request, params }: ActionFunctionArgs) { 
+  invariant(params.projectId, "Missing projectId (project name) param"); 
+  const projectName = params.projectId;
 
-  const jobRequest = {
-    urls: formData.getAll("urls").map(url => String(url)).filter(url => url !== ""), 
-    schema_name: String(formData.get("schemaName") || ""), 
-    return_schema_list: false, 
-    crawl_config: enableCrawling ? {
-      enable_crawling: true,
-      max_depth: 2, 
-      max_urls: 10, 
-      enable_chunking: true, 
-      chunk_size: 5000, 
-      chunk_overlap: 100, 
-    } : {
-      enable_crawling: false,
+  const formData = await request.formData();
+  const enableCrawling = formData.get("crawlEnabled") === "on";
+  const urls = formData.getAll("urls").map(url => String(url)).filter(url => url !== "");
+  const schemaName = String(formData.get("schemaName") || "");
+  const modelProvider = String(formData.get("modelProvider") || "");
+  const modelName = String(formData.get("modelName") || "");
+
+  const projectPayload: Project = {
+    name: projectName,
+    urls: urls,
+    schema_name: schemaName || undefined,
+    crawl_config: {
+      enable_crawling: enableCrawling,
       max_depth: 2,
-      max_urls: 3,
-      enable_chunking: true,
-      chunk_size: 5000,
-      chunk_overlap: 100
+      max_urls: 10, 
     },
-    scraper_config: {
-      max_hallucination_checks: 3, 
-      max_quality_checks: 3, 
-      enable_hallucination_check: true, 
-      enable_quality_check: true, 
-    },
-    llm_model_type: String(formData.get("modelProvider") || ""), 
-    llm_model_name: String(formData.get("modelName") || ""), 
+    llm_type: modelProvider || "",
+    llm_model_name: modelName || "",
   };
 
-  console.log("Submitting Job Request:", jobRequest);
+  const jobRequest = {
+    urls: projectPayload.urls,
+    schema_name: projectPayload.schema_name,
+    return_schema_list: false, 
+    crawl_config: projectPayload.crawl_config,
+    llm_type: projectPayload.llm_type,
+    llm_model_name: projectPayload.llm_model_name,
+  };
 
   try {
+    console.log("Saving project configuration:", JSON.stringify(projectPayload, null, 2));
+    await createOrUpdateProject(projectPayload);
+    console.log("Project configuration saved successfully.");
+
+    console.log("Submitting Job Request:", JSON.stringify(jobRequest, null, 2));
     const data = await startScrapeJob(jobRequest);
     console.log("Job Start Response:", data);
     return json<ActionData>({ success: true, job_id: data.job_id });
+
   } catch (error: any) {
-    console.error("Job Start Error:", error);
+    console.error("Action Error (Save Project or Start Job):", error);
     return json<ActionData>({ 
       success: false, 
-      message: error.message || "Failed to start scraping job" 
-    }, { status: 400 }); 
+      message: error.message || "Failed to save configuration or start scraping job" 
+    }, { status: 500 }); 
   }
 }
 
