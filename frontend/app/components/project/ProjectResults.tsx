@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFetcher } from '@remix-run/react';
 import type { ActionData } from '~/routes/projects.$projectId'; 
-import type { JobStatusResponse } from '~/types/types'; 
 
 type ProjectResultsProps = {
   actionData?: ActionData;
@@ -269,8 +268,8 @@ const ProjectResults: React.FC<ProjectResultsProps> = ({ actionData }) => {
             {jobStatus.status === 'success' && report && (
                <div className="w-full h-full mt-2 pt-3 border-t border-gray-600">
                  <h3 className="text-base font-semibold mb-1 text-green-400 flex-shrink-0">Report Data:</h3>
-                 <div className="flex-grow overflow-auto">
-                   <pre className="bg-gray-900 p-2 rounded text-xs border border-gray-600 h-full">{JSON.stringify(report, null, 2)}</pre>
+                 <div className="flex-grow overflow-hidden">
+                   <ClientOnlyJsonView data={report} />
                  </div>
               </div>
             )}
@@ -290,10 +289,50 @@ const ProjectResults: React.FC<ProjectResultsProps> = ({ actionData }) => {
         <h2 className="text-xl font-semibold">Results</h2>
         {/* Removed edit button */}
       </div>
-      <div className="flex-grow mt-1 overflow-y-auto pr-1">
+      <div className="flex-grow mt-1 overflow-hidden">
          {renderContent()}
       </div>
     </div>
+  );
+};
+
+// Dynamically load react-json-view and only render on client.
+const ClientOnlyJsonView: React.FC<{ data: any }> = ({ data }) => {
+  const [ReactJson, setReactJson] = useState<any>(null);
+  useEffect(() => {
+    let mounted = true;
+    import('react-json-view').then(mod => {
+      if (mounted) setReactJson(() => mod.default);
+    });
+    return () => { mounted = false; };
+  }, []);
+  if (!ReactJson) {
+    // Fallback: show plain JSON or spinner
+    return (
+      <pre className="bg-gray-900 p-2 rounded text-xs border border-gray-600 overflow-auto text-gray-300">
+        Loading viewer...
+        {JSON.stringify(data, null, 2)}
+      </pre>
+    );
+  }
+  return (
+    <ReactJson
+      src={data["content"]}
+      name={false}
+      enableClipboard={true}
+      displayDataTypes={false}
+      collapsed={2}
+      style={{
+        background: 'transparent',
+        fontSize: '0.85em',
+        borderRadius: '0.375rem',
+        maxHeight: 'calc(100vh - 300px)',
+        overflow: 'auto',
+        padding: '0.5em',
+        color: '#d1d5db',
+      }}
+      theme="monokai"
+    />
   );
 };
 

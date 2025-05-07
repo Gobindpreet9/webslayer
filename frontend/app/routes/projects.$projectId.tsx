@@ -64,10 +64,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const jobRequest = {
     urls: projectPayload.urls,
-    schema_name: projectPayload.schema_name,
-    return_schema_list: false, 
+    schema_name: projectPayload.schema_name || "",
+    return_schema_list: true, 
     crawl_config: projectPayload.crawl_config,
-    llm_type: projectPayload.llm_type,
+    llm_model_type: projectPayload.llm_type,
     llm_model_name: projectPayload.llm_model_name,
   };
 

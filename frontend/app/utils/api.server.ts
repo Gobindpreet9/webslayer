@@ -24,7 +24,16 @@ export interface Project {
   crawl_config: CrawlConfig;
 }
 
-export async function startScrapeJob(jobRequest: any): Promise<JobCreationResponse> {
+export interface JobRequest {
+  urls: string[];
+  schema_name: string;
+  return_schema_list: boolean;
+  crawl_config: CrawlConfig;
+  llm_model_type: string;
+  llm_model_name: string;
+}
+
+export async function startScrapeJob(jobRequest: JobRequest): Promise<JobCreationResponse> {
   const response = await fetch(`${ENV.API_URL}/scrape/start`, {
     method: "POST",
     headers: {
