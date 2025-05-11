@@ -65,8 +65,16 @@ export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
   return data;
 }
 
-export async function getSchemas() {
+export async function getAllSchemaNames() {
   const response = await fetch(`${ENV.API_URL}/schema/`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch schemas");
+  }
+  return response.json();
+}
+
+export async function getSchema(schemaName: string) {
+  const response = await fetch(`${ENV.API_URL}/schema/${schemaName}`);
   if (!response.ok) {
     throw new Error("Failed to fetch schemas");
   }

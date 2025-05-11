@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { getSchemas, createSchema } from "~/utils/api.server";
+import { getAllSchemaNames, createSchema } from "~/utils/api.server";
 import type { SchemaField } from "~/types/types";
 
 const handleApiError = (error: any, defaultMessage: string) => {
@@ -10,7 +10,7 @@ const handleApiError = (error: any, defaultMessage: string) => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
-    const schemas = await getSchemas();
+    const schemas = await getAllSchemaNames();
     return json(schemas);
   } catch (error) {
     return handleApiError(error, "Failed to fetch schemas");

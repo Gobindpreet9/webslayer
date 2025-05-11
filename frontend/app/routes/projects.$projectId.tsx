@@ -4,7 +4,7 @@ import { Form, useLoaderData, useParams, useActionData } from "@remix-run/react"
 import invariant from "tiny-invariant";
 
 import Layout from "~/components/layout/Layout";
-import { startScrapeJob, getProjectByName, getSchemas, createOrUpdateProject } from "~/utils/api.server";
+import { startScrapeJob, getProjectByName, getAllSchemaNames, createOrUpdateProject } from "~/utils/api.server";
 import type { Project } from "~/utils/api.server"; 
 
 import ProjectHeader from '~/components/project/ProjectHeader';
@@ -24,7 +24,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   try {
     const [projectDetailsData, schemasData] = await Promise.all([
       getProjectByName(projectName), 
-      getSchemas() 
+      getAllSchemaNames() 
     ]);
     const projectDetails: Project = projectDetailsData;
     const availableSchemas: string[] = schemasData;

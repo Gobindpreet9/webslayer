@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import type { MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData, useRevalidator } from "@remix-run/react"; 
+import { useFetcher, useLoaderData, useRevalidator } from "@remix-run/react"; 
 import Layout from "~/components/layout/Layout";
+import type { Schema } from "~/types/types";
+import { getAllSchemaNames, getSchema } from "~/utils/api.server";
+import SchemaCards from "~/components/dashboard/SchemaCards";
+import ProjectCards, { Project } from "~/components/dashboard/ProjectCards";
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,46 +16,47 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-// Placeholder type for Project data - replace with actual type from backend
-type Project = {
-  id: string;
-  name: string;
-  description?: string; 
-  lastRun?: string; 
-};
+// Project type is now imported from ProjectCards component
 
 // Define a discriminated union type for the loader data
-type LoaderData = 
-  | { projects: Project[]; error: false; message?: never } 
-  | { projects: []; error: true; message: string };
+type LoaderData =
+  | { projects: Project[]; schemas: Schema[]; error: false; message?: never }
+  | { projects: []; schemas: Schema[]; error: true; message: string };
 
 // Loader function to fetch projects from the backend proxy API
-export async function loader({ request }: LoaderFunctionArgs): Promise<Response> { // Return Response for json helper
-  const apiUrl = new URL('/api/projects', request.url); // Construct URL relative to request
+export async function loader({ request }: LoaderFunctionArgs): Promise<Response> {
+  const apiUrl = new URL('/api/projects', request.url);
   try {
-    const response = await fetch(apiUrl.toString());
-    if (!response.ok) {
-      // Handle non-successful responses (like 404, 500)
-      const errorText = await response.text();
-      console.error(`Error fetching projects: ${response.status} ${response.statusText}`, errorText);
-      return json({ projects: [], error: true, message: `Failed to fetch projects (${response.status})` } satisfies LoaderData, { status: response.status });
+    const [projectsResponse, schemaNames] = await Promise.all([
+      fetch(apiUrl.toString()),
+      getAllSchemaNames()
+    ]);
+    // Fetch full schema details for each schema name
+    let schemas: Schema[] = [];
+    if (Array.isArray(schemaNames)) {
+      schemas = await Promise.all(
+        schemaNames.map((name: string) => getSchema(name))
+      );
     }
-    const projects = await response.json();
-    // Ensure projects is an array, default to empty array if not
+    if (!projectsResponse.ok) {
+      const errorText = await projectsResponse.text();
+      console.error(`Error fetching projects: ${projectsResponse.status} ${projectsResponse.statusText}`, errorText);
+      return json({ projects: [], schemas, error: true, message: `Failed to fetch projects (${projectsResponse.status})` } satisfies LoaderData, { status: projectsResponse.status });
+    }
+    const projects = await projectsResponse.json();
     const safeProjects = Array.isArray(projects) ? projects : [];
-    // Explicitly return the success shape
-    return json({ projects: safeProjects, error: false } satisfies LoaderData);
+    return json({ projects: safeProjects, schemas, error: false } satisfies LoaderData);
   } catch (error) {
-    // Handle network errors or fetch exceptions
-    console.error("Network error fetching projects:", error);
-    // Explicitly return the error shape
-    return json({ projects: [], error: true, message: "Could not connect to the backend to fetch projects." } satisfies LoaderData, { status: 503 });
+    console.error("Network error fetching projects or schemas:", error);
+    return json({ projects: [], schemas: [], error: true, message: "Could not connect to the backend to fetch projects or schemas." } satisfies LoaderData, { status: 503 });
   }
 }
 
 export default function ProjectsDashboard() {
   // Use loader data with the explicit LoaderData type
   const loaderData = useLoaderData<LoaderData>();
+  const schemas = !loaderData.error ? loaderData.schemas : [];
+  const projects = !loaderData.error ? loaderData.projects : [];
   // Get revalidator hook
   const revalidator = useRevalidator();
 
@@ -77,26 +82,27 @@ export default function ProjectsDashboard() {
     }
   }, [fetcher.state, fetcher.data, revalidator]); 
 
+  // Handle showing the new project form
+  const handleCreateProject = () => {
+    setShowInput(true);
+  };
+
   return (
     <Layout>
-      <div className="container mx-auto p-4 md:p-6 lg:p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">My Projects</h1>
-          {/* Replace Link with Button */}
-          {!showInput && (
-             <button
-               onClick={() => setShowInput(true)}
-               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150 ease-in-out"
-             >
-               + New Project
-             </button>
-          )}
-        </div>
+      <div className="container mx-auto">
+        {/* Display loader error if present, using loaderData.error as type guard */}
+        {loaderData.error && (
+          <div className="mb-4 p-4 border border-red-700 rounded-md bg-red-900 text-red-100">
+            <p className="font-bold">Error Loading Projects</p>
+            {/* Access message safely because loaderData.error is true */}
+            <p>{loaderData.message || 'An unexpected error occurred.'}</p>
+          </div>
+        )}
 
         {/* Conditional Input Form */}
         {showInput && (
           <fetcher.Form method="post" action="/api/projects" 
-              className="mb-6 flex items-center gap-2 p-4 border border-gray-700 rounded-md bg-gray-800 shadow">
+              className="mb-10 flex items-center gap-2 p-4 border border-gray-700 rounded-md bg-gray-800 shadow">
               <input
                 type="text"
                 name="name" // Name attribute for potential non-JS fallback
@@ -124,48 +130,15 @@ export default function ProjectsDashboard() {
           </fetcher.Form>
         )}
 
-        {/* Display loader error if present, using loaderData.error as type guard */}
-        {loaderData.error && (
-          <div className="mb-4 p-4 border border-red-700 rounded-md bg-red-900 text-red-100">
-            <p className="font-bold">Error Loading Projects</p>
-            {/* Access message safely because loaderData.error is true */}
-            <p>{loaderData.message || 'An unexpected error occurred.'}</p>
-          </div>
-        )}
-
-        {/* Display project list or empty state (only if no loader error) */}
-        {!loaderData.error && loaderData.projects.length === 0 ? (
-          <p className="text-center text-gray-500">You don't have any projects yet. Create one to get started!</p>
-        ) : !loaderData.error ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* Access projects safely because loaderData.error is false */}
-            {loaderData.projects.map((project: Project) => (
-              // FIX: Use project.name (URL encoded) in the link instead of project.id
-              <Link key={project.id} to={`/projects/${encodeURIComponent(project.name)}`} className="block hover:no-underline">
-                <div className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col justify-between bg-gray-800 border-gray-700">
-                  <div>
-                    <h2 className="text-lg font-semibold mb-2 truncate text-white">{project.name}</h2>
-                    {project.description && (
-                      <p className="text-sm text-gray-400 mb-3 h-10 overflow-hidden">{project.description}</p>
-                    )}
-                  </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    {project.lastRun && (
-                      <p className="text-xs text-gray-500">Last run: {project.lastRun}</p>
-                    )}
-                    {/* Optional: Add quick action button like 'Run' */}
-                    <button 
-                      onClick={(e) => { e.preventDefault(); alert(`TODO: Run project ${project.id}`); }} 
-                      className="text-sm text-blue-500 hover:text-blue-400 font-medium"
-                    >
-                      Run
-                    </button>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : null }
+        {/* Projects Section */}
+        <ProjectCards 
+          projects={projects} 
+          onCreateProject={handleCreateProject} 
+          showCreateButton={!showInput} 
+        />
+        
+        {/* Schema Cards Section */}
+        <SchemaCards schemas={schemas} onSchemaClick={() => { /* TODO: implement navigation */ }} />
       </div>
     </Layout>
   );
