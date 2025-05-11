@@ -1,18 +1,28 @@
 import React from "react";
+import { Link } from "@remix-run/react";
 import type { Schema } from "~/types/types";
 
 interface SchemaCardsProps {
   schemas: Schema[];
   onSchemaClick?: (schemaName: string) => void;
+  showCreateButton?: boolean;
 }
 
-const SchemaCards: React.FC<SchemaCardsProps> = ({ schemas, onSchemaClick }) => {
+const SchemaCards: React.FC<SchemaCardsProps> = ({ schemas, onSchemaClick, showCreateButton = true }) => {
   if (!schemas.length) return null;
 
   return (
     <div className="mt-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Available Schemas</h2>
+        {showCreateButton && (
+          <Link 
+            to="/schemas/"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150 ease-in-out"
+          >
+            Manage Schemas
+          </Link>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {schemas.map((schema) => (

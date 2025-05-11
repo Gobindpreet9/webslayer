@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { getAllSchemaNames, createSchema } from "~/utils/api.server";
+import { getAllSchemaNames, upsertSchema } from "~/utils/api.server";
 import type { SchemaField } from "~/types/types";
 
 const handleApiError = (error: any, defaultMessage: string) => {
@@ -28,7 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const name = typeof nameValue === 'string' ? nameValue : null;
     const fields = JSON.parse(formData.get('fields') as string);
 
-    const result = await createSchema({ name, fields });
+    const result = await upsertSchema({ name, fields });
     return json(result);
   } catch (error) {
     return handleApiError(error, "Failed to create schema");

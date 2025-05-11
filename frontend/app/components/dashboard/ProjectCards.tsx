@@ -29,7 +29,7 @@ const ProjectCards: React.FC<ProjectCardsProps> = ({
             onClick={onCreateProject}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150 ease-in-out"
           >
-            + New Project
+            Add Project
           </button>
         )}
       </div>
@@ -44,12 +44,12 @@ const ProjectCards: React.FC<ProjectCardsProps> = ({
                 <div>
                   <h3 className="text-lg font-semibold mb-2 truncate text-white">{project.name}</h3>
                   {project.description && (
-                    <p className="text-sm text-gray-400 mb-3 h-10 overflow-hidden">{project.description}</p>
+                    <p key={`desc-${project.id}`} className="text-sm text-gray-400 mb-3 h-10 overflow-hidden">{project.description}</p>
                   )}
                 </div>
                 <div className="mt-4 flex justify-between items-center">
                   {project.lastRun && (
-                    <p className="text-xs text-gray-500">Last run: {project.lastRun}</p>
+                    <p key={`lastrun-${project.id}`} className="text-xs text-gray-500">Last run: {project.lastRun}</p>
                   )}
                 </div>
               </div>

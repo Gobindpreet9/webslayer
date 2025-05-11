@@ -81,7 +81,7 @@ export async function getSchema(schemaName: string) {
   return response.json();
 }
 
-export async function createSchema({ name, fields }: SchemaCreateRequest) {
+export async function upsertSchema({ name, fields }: SchemaCreateRequest) {
   const response = await fetch(`${ENV.API_URL}/schema/`, {
     method: "POST",
     headers: {

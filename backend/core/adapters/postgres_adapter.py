@@ -189,14 +189,15 @@ class PostgresAdapter(DataAdapterInterface):
     async def upsert_project(self, db: AsyncSession, project: ProjectPydantic) -> ProjectPydantic:
         try:
             async with db.begin():
-                schema_exists = await db.execute(
-                    select(SchemaDefinition).where(SchemaDefinition.name == project.schema_name)
-                    )
-                if not schema_exists.scalar_one_or_none():
-                    raise HTTPException(
-                        status_code=404,
-                        detail=f"Schema '{report.schema_name}' not found"
-                    )
+                if project.schema_name:
+                    schema_exists = await db.execute(
+                        select(SchemaDefinition).where(SchemaDefinition.name == project.schema_name)
+                        )
+                    if not schema_exists.scalar_one_or_none():
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"Schema '{project.schema_name}' not found"
+                        )
                 # Convert HttpUrl objects to strings for JSON serialization
                 urls_as_strings = [str(url) for url in project.urls]
 

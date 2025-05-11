@@ -54,16 +54,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     } catch (e) {
         urls = urlsString ? urlsString.split(',').map(u => u.trim()).filter(u => u) : [];
     }
-    if (urls.length === 0) {
-        return json({ error: "At least one URL is required" }, { status: 400 });
-    }
 
     const payload = { 
       name: name,
       urls: urls, 
       llm_type: llm_type || "openai", 
       llm_model_name: llm_model_name || "gpt-4", 
-      schema_name: schema_name || "default_schema", 
+      schema_name: schema_name, 
       crawl_config: {
         limit: crawl_limit ? parseInt(crawl_limit, 10) : 100, 
         depth: crawl_depth ? parseInt(crawl_depth, 10) : 1,   
