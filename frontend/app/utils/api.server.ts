@@ -96,6 +96,16 @@ export async function upsertSchema({ name, fields }: SchemaCreateRequest) {
   return { success: true };
 }
 
+export async function deleteSchema(schemaName: string) {
+  const response = await fetch(`${ENV.API_URL}/schema/${schemaName}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to delete schema ${schemaName} (${response.status})`);
+  }
+}
+
 export async function getReport(reportName: string): Promise<any> {
   const response = await fetch(`${ENV.API_URL}/reports/${reportName}`);
   

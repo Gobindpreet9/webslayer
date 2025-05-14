@@ -98,10 +98,10 @@ const ProjectCards: React.FC<ProjectCardsProps> = ({
                   e.stopPropagation();
                   handleOpenConfirmDialog(project.name);
                 }}
-                className="absolute top-3 right-3 p-1.5 bg-gray-700/50 hover:bg-red-600/80 text-gray-400 hover:text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 scale-90 group-hover:scale-100"
+                className="absolute top-2 right-2 p-1.5 hover:bg-red-600/80 text-gray-400 hover:text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 scale-90 group-hover:scale-100"
                 aria-label={`Delete project ${project.name}`}
               >
-                <Trash2 size={18} />
+                <Trash2 size={16} />
               </button>
             </div>
           ))}
