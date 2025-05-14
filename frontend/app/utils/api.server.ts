@@ -13,9 +13,7 @@ export interface CrawlConfig {
   max_urls: number;
 }
 
-// --- Project Types ---
 export interface Project {
-  id?: string;
   name: string;
   urls: string[];
   llm_type: string;
@@ -158,3 +156,14 @@ export async function createOrUpdateProject(project: Project): Promise<Project> 
   }
   return response.json();
 }
+
+export async function deleteProject(projectName: string): Promise<void> {
+  const response = await fetch(`${ENV.API_URL}/projects/${projectName}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to delete project ${projectName} (${response.status})`);
+  }
+}
+  

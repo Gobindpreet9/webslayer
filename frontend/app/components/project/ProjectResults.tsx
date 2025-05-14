@@ -127,8 +127,6 @@ const ProjectResults: React.FC<ProjectResultsProps> = ({ actionData }) => {
          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17.672l-5.25-5.25L3 14.097l6.75 6.75 12-12-1.575-1.575L9.75 17.672z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" opacity="0.3"/> 
-              {/* Simple checkmark and downward arrow motif */}
            </svg>
            <p className="text-sm font-medium">Ready to Scrape!</p>
            <p className="text-xs mt-1">Configure your job and click 'Start Scraping' to see results here.</p>

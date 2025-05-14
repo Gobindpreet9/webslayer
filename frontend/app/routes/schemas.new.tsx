@@ -279,7 +279,7 @@ export default function NewSchema() {
               onClick={addField}
               className="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow-sm transition duration-150 ease-in-out"
             >
-              + Add Field
+              Add Field
             </button>
             
             {actionData?.fieldErrors?.['fields'] && (

@@ -5,6 +5,7 @@ import { Form, Link, useActionData, useLoaderData, useNavigate, useParams } from
 import Layout from "~/components/layout/Layout";
 import type { Schema, SchemaField } from "~/types/types";
 import { getSchema, upsertSchema } from "~/utils/api.server";
+import Toast from '~/components/common/Toast';
 import { AnimatePresence, motion } from "framer-motion";
 
 export const meta: MetaFunction = () => {
@@ -96,7 +97,7 @@ export default function EditSchema() {
   // Local state for the schema fields
   const [fields, setFields] = useState<SchemaField[]>(schema.fields);
   const [isDirty, setIsDirty] = useState(false);
-  const [notification, setNotification] = useState<{show: boolean, message: string, type: 'success' | 'error'}>({ 
+  const [notification, setNotification] = useState<{show: boolean, message: string, type: 'success' | 'error' | 'info' | 'warning'}>({ 
     show: false, 
     message: '', 
     type: 'success' 
@@ -177,37 +178,12 @@ export default function EditSchema() {
   
   return (
     <Layout>
-      <AnimatePresence>
-        {notification.show && (
-          <motion.div 
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 ${notification.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}
-          >
-            <div className="flex-shrink-0">
-              {notification.type === 'success' ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              )}
-            </div>
-            <div>{notification.message}</div>
-            <button 
-              onClick={() => setNotification(prev => ({ ...prev, show: false }))}
-              className="ml-auto text-white hover:text-gray-200"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Toast 
+        show={notification.show}
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification(prev => ({ ...prev, show: false }))}
+      />
       
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-6">
@@ -355,7 +331,7 @@ export default function EditSchema() {
               onClick={addField}
               className="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow-sm transition duration-150 ease-in-out"
             >
-              + Add Field
+              Add Field
             </button>
           </div>
           

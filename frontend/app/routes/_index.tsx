@@ -5,9 +5,10 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useFetcher, useLoaderData, useRevalidator, useNavigate } from "@remix-run/react"; 
 import Layout from "~/components/layout/Layout";
 import type { Schema } from "~/types/types";
-import { getAllSchemaNames, getSchema } from "~/utils/api.server";
+import { getAllSchemaNames, getSchema, type Project } from "~/utils/api.server";
 import SchemaCards from "~/components/dashboard/SchemaCards";
-import ProjectCards, { Project } from "~/components/dashboard/ProjectCards";
+import ProjectCards from "~/components/dashboard/ProjectCards"; 
+import Toast from '~/components/common/Toast'; 
 import { AnimatePresence, motion } from "framer-motion";
 
 export const meta: MetaFunction = () => {
@@ -16,8 +17,6 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Manage your web scraping projects" }, 
   ];
 };
-
-// Project type is now imported from ProjectCards component
 
 // Define a discriminated union type for the loader data
 type LoaderData =
@@ -69,7 +68,7 @@ export default function ProjectsDashboard() {
   const fetcher = useFetcher();
   
   // State for toast notifications
-  const [notification, setNotification] = useState<{show: boolean, message: string, type: 'success' | 'error'}>({ 
+  const [notification, setNotification] = useState<{show: boolean, message: string, type: 'success' | 'error' | 'info' | 'warning'}>({ 
     show: false, 
     message: '', 
     type: 'success' 
@@ -98,7 +97,7 @@ export default function ProjectsDashboard() {
         revalidator.revalidate();
       }
     }
-  }, [fetcher.state, fetcher.data, newProjectName]); // Removed revalidator from dependencies
+  }, [fetcher.state, fetcher.data, newProjectName]); 
   
   // Auto-hide notification after 5 seconds
   useEffect(() => {
@@ -123,38 +122,13 @@ export default function ProjectsDashboard() {
 
   return (
     <Layout>
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {notification.show && (
-          <motion.div 
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 ${notification.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}
-          >
-            <div className="flex-shrink-0">
-              {notification.type === 'success' ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              )}
-            </div>
-            <div>{notification.message}</div>
-            <button 
-              onClick={() => setNotification(prev => ({ ...prev, show: false }))}
-              className="ml-auto text-white hover:text-gray-200"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Use common Toast Notification */}
+      <Toast 
+        show={notification.show}
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification(prev => ({ ...prev, show: false }))}
+      />
       
       <div className="container mx-auto">
         {/* Display loader error if present, using loaderData.error as type guard */}
